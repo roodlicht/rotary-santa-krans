@@ -5,6 +5,8 @@ set -uo pipefail
 # Deze Plesk-omgeving gebruikt nodenv: npm/node zitten in de nodenv-shims.
 # In de niet-interactieve deploy-shell staat die map niet op PATH, dus toevoegen.
 export PATH="${HOME:-/var/www/vhosts/rotarykerstkrans.nl}/.nodenv/shims:$PATH"
+# Welke node-versie nodenv moet gebruiken (ook vastgelegd in .node-version).
+export NODENV_VERSION="${NODENV_VERSION:-24}"
 
 # Terugval op de Plesk-node-pakketten als nodenv ontbreekt.
 command -v npm >/dev/null 2>&1 || for p in $(ls -d /opt/plesk/node/*/bin 2>/dev/null); do
