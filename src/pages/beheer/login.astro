@@ -1,12 +1,15 @@
 ---
 export const prerender = false;
 import Base from '../../layouts/Base.astro';
+import { beheerGeconfigureerd } from '../../lib/auth';
 const fout = Astro.url.searchParams.get('fout') === '1';
+const ingesteld = beheerGeconfigureerd();
 ---
 <Base title="Beheer — inloggen" noindex={true}>
   <section class="wrap page-hero"><div class="eyebrow">Beheer</div><h1>Inloggen</h1><p>Bekijk bestellingen, de uitgiftelijst en de export.</p></section>
   <section class="wrap" style="max-width:420px;margin-bottom:80px">
-    {fout && <div class="notice" style="background:#f6e0de;margin-bottom:16px">Onjuist wachtwoord.</div>}
+    {!ingesteld && <div class="notice" style="background:#f6e0de;margin-bottom:16px">Beheer is nog niet ingesteld: zet ADMIN_PASSWORD en SESSION_SECRET in de Node.js-omgevingsvariabelen en herstart de app.</div>}
+    {fout && ingesteld && <div class="notice" style="background:#f6e0de;margin-bottom:16px">Onjuist wachtwoord.</div>}
     <form class="panel" method="post" action="/api/beheer/login">
       <label class="field">Wachtwoord<input type="password" name="wachtwoord" autocomplete="current-password" required autofocus /></label>
       <div class="panel-nav"><span></span><button class="btn btn-r" type="submit">Inloggen</button></div>
