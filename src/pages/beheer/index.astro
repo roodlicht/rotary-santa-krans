@@ -1,0 +1,95 @@
+---
+export const prerender = false;
+import Base from '../../layouts/Base.astro';
+import { betaaldeBestellingen, uitgifteOverzicht } from '../../lib/orders';
+import { db } from '../../lib/db';
+import { euroPrefix } from '../../lib/money';
+import { producten } from '../../config/site';
+
+const orders = betaaldeBestellingen();
+const overzicht = uitgifteOverzicht();
+const totaalOmzet = orders.reduce((s, o) => s + o.totaal_cent, 0);
+const telProduct = (pid: string) => orders.reduce((s, o) => s + o.items.filter((i) => i.product_id === pid).reduce((a, i) => a + i.aantal, 0), 0);
+const aantalPending = (db.prepare("SELECT COUNT(*) AS n FROM orders WHERE status = 'pending'").get() as { n: number }).n;
+
+const besteller = (o: any) => (o.klanttype === 'zakelijk' && o.bedrijfsnaam ? `${o.bedrijfsnaam} (${o.naam})` : o.naam);
+const regels = (o: any) => o.items.map((i: any) => `${i.aantal}× ${i.naam}`).join(', ');
+const groepKey = (o: any) => o.ophaal_type || 'donatie';
+const ordersVan = (type: string | null) => orders.filter((o) => (o.ophaal_type || 'donatie') === (type || 'donatie'));
+const emailsVan = (type: string | null) => [...new Set(ordersVan(type).map((o) => o.email))].join(', ');
+---
+<Base title="Beheer — bestellingen" noindex={true}>
+  <section class="wrap" style="padding-top:40px;padding-bottom:80px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
+      <h1 style="font-size:40px">Bestellingen</h1>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a class="btn btn-o" href="/api/beheer/export.csv">Export alles (CSV) ↓</a>
+        <a class="btn btn-o" href="/api/beheer/login">Uitloggen</a>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:20px 0">
+      <div class="infocard"><span style="color:var(--muted);font-size:14px">Betaalde bestellingen</span><b style="font-size:30px;font-family:'Young Serif';font-weight:400">{orders.length}</b></div>
+      <div class="infocard"><span style="color:var(--muted);font-size:14px">Kransen</span><b style="font-size:30px;font-family:'Young Serif';font-weight:400">{telProduct('krans')}</b></div>
+      <div class="infocard"><span style="color:var(--muted);font-size:14px">Stollen</span><b style="font-size:30px;font-family:'Young Serif';font-weight:400">{telProduct('stol')}</b></div>
+      <div class="infocard"><span style="color:var(--muted);font-size:14px">Donaties</span><b style="font-size:30px;font-family:'Young Serif';font-weight:400">{telProduct('donatie')}</b></div>
+      <div class="infocard"><span style="color:var(--muted);font-size:14px">Opbrengst</span><b style="font-size:30px;font-family:'Young Serif';font-weight:400;color:var(--red)">{euroPrefix(totaalOmzet)}</b></div>
+    </div>
+    {aantalPending > 0 && <p style="color:var(--muted);font-size:15px">Daarnaast {aantalPending} onvoltooide (niet-betaalde) bestelling(en) — niet meegeteld.</p>}
+
+    <h2 style="font-size:30px;margin-top:30px">Uitgifte per afhaalgroep</h2>
+    <p style="color:var(--muted)">Per groep: totaal klaarzetten, wie er komt, en een export + e-maillijst om die groep te mailen.</p>
+    {overzicht.length === 0 && <p style="color:var(--muted)">Nog geen betaalde bestellingen.</p>}
+
+    {overzicht.map((m) => (
+      <div class="infocard" style="margin:16px 0;gap:14px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap">
+          <h3 style="font-size:22px">{m.label}</h3>
+          <div style="display:flex;gap:10px;align-items:center">
+            <span style="color:var(--muted)">{m.bestellingen} bestelling(en) · {euroPrefix(m.omzetCent)}</span>
+            <a class="btn btn-o" style="padding:8px 14px;font-size:14px" href={`/api/beheer/export.csv?groep=${m.type || 'donatie'}`}>Export deze groep ↓</a>
+          </div>
+        </div>
+        <div style="padding:12px 14px;background:var(--cream2);border-radius:12px;font-weight:600">
+          Klaarzetten: {[...m.producten.entries()].map(([n, a]) => `${a}× ${n}`).join(' · ') || '—'}
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data">
+            <thead><tr><th>Besteller</th><th>Bestelling</th><th>Contact</th><th>Nr.</th></tr></thead>
+            <tbody>
+              {ordersVan(m.type).map((o) => (
+                <tr>
+                  <td>{besteller(o)} <span class="badge paid">{o.klanttype}</span></td>
+                  <td>{regels(o)}</td>
+                  <td>{o.email}{o.telefoon ? ` · ${o.telefoon}` : ''}</td>
+                  <td>{o.id}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <details><summary style="cursor:pointer;color:var(--red);font-weight:600">E-mailadressen van deze groep</summary><textarea readonly rows="2" style="margin-top:8px;width:100%;font-size:14px">{emailsVan(m.type)}</textarea></details>
+      </div>
+    ))}
+
+    <h2 style="font-size:30px;margin-top:30px">Alle betaalde bestellingen</h2>
+    <div style="overflow-x:auto">
+      <table class="data">
+        <thead><tr><th>Nr.</th><th>Datum</th><th>Besteller</th><th>Type</th><th>Bestelling</th><th>Afhalen</th><th>Totaal</th></tr></thead>
+        <tbody>
+          {orders.map((o) => (
+            <tr>
+              <td>{o.id}</td>
+              <td>{new Date(o.created_at).toLocaleDateString('nl-NL')}</td>
+              <td>{besteller(o)}<br /><span style="color:var(--muted);font-size:13px">{o.email}</span></td>
+              <td>{o.klanttype}</td>
+              <td>{regels(o)}</td>
+              <td>{o.ophaal_label || '— (alleen donatie)'}</td>
+              <td>{euroPrefix(o.totaal_cent)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</Base>

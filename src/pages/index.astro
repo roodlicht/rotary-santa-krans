@@ -1,0 +1,117 @@
+---
+export const prerender = true;
+import Base from '../layouts/Base.astro';
+import { club, seo, goedeDoel, producten, momenten } from '../config/site';
+import { euroPrefix } from '../lib/money';
+
+const krans = producten.find((p) => p.id === 'krans')!;
+const stol = producten.find((p) => p.id === 'stol')!;
+const donatie = producten.find((p) => p.id === 'donatie')!;
+const prodCards = [krans, stol];
+
+const jsonLd = [
+  { '@context': 'https://schema.org', '@type': 'Organization', name: club.naam, email: club.contactEmail, description: seo.beschrijving, address: { '@type': 'PostalAddress', streetAddress: 'Rietveen 1', postalCode: '4823 HK', addressLocality: 'Breda', addressCountry: 'NL' } },
+  ...prodCards.map((p) => ({ '@context': 'https://schema.org', '@type': 'Product', name: p.naam, description: p.omschrijving, offers: { '@type': 'Offer', priceCurrency: 'EUR', price: (p.prijsCent / 100).toFixed(2), availability: 'https://schema.org/InStock' } })),
+];
+---
+<Base active="home" jsonLd={jsonLd}>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">Rotary Santa Krans {club.jaar}</div>
+        <h1>Kerstkransen en kerststollen voor <em>het goede doel</em></h1>
+        <p class="lede">Bestel een roomboter kerstkrans of ambachtelijke kerststol, beide met echte amandelspijs. De opbrengst gaat naar het goede doel.</p>
+        <div class="ctas">
+          <a class="btn btn-r" href="/bestellen">Bestel nu →</a>
+          <a class="btn btn-o" href="#afhalen">Besteldata &amp; afhalen</a>
+        </div>
+      </div>
+      <div class="hero-media">
+        <div class="hero-photo"><img src="/img/krans-close.jpg" alt="Roomboter kerstkrans met amandelspijs" /></div>
+        <div class="price-badge"><div><b>€17</b><small>per stuk</small></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:20px">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><div class="eyebrow">Het assortiment</div><h2>Kies je kerstlekkernij</h2></div>
+        <p>Vers gebakken met roomboter en echte amandelspijs. Liever alleen geven? Doneer dan direct aan het goede doel.</p>
+      </div>
+      <div class="prods">
+        {prodCards.map((p) => (
+          <div class="prod">
+            <div class={'prod-img' + (p.contain ? ' contain' : '')}><img src={`/img/${p.afbeelding}`} alt={p.naam} /></div>
+            <div class="prod-body">
+              <h3>{p.naam}</h3><p>{p.omschrijving}</p>
+              <div class="pr">{euroPrefix(p.prijsCent)}<small>per stuk</small></div>
+              <a class="btn btn-r" href="/bestellen">Bestellen</a>
+            </div>
+          </div>
+        ))}
+        <div class="prod don">
+          <div class="don-top"><div>Geen krans nodig? Doneer er een.</div></div>
+          <div class="prod-body">
+            <h3>Donatie</h3><p>Steun het goede doel zonder product. Je kunt meerdere donaties tegelijk doen.</p>
+            <div class="pr">{euroPrefix(donatie.prijsCent)}<small>per donatie</small></div>
+            <a class="btn btn-g" href="/bestellen">Doneren</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="afhalen" style="padding-top:20px">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><div class="eyebrow">Besteldata &amp; afhalen</div><h2>Twee afhaalmomenten</h2></div>
+        <p>Bedrijven en particulieren halen op verschillende dagen af, op hetzelfde adres: {club.adres}.</p>
+      </div>
+      <div class="moments">
+        <div class="moment biz">
+          <h3>{momenten.zakelijk.label}</h3>
+          <div class="rows">
+            <div class="row"><span>Bestellen tot</span><b>{momenten.zakelijk.deadlineTxt}</b></div>
+            <div class="row"><span>Afhalen</span><b>{momenten.zakelijk.ophalenTxt}</b></div>
+            <div class="row"><span>Adres</span><b>{club.adres}</b></div>
+            <div class="row"><span>Factuur</span><b>Op bedrijfsnaam, na betaling</b></div>
+          </div>
+          <div><a class="btn btn-g" href="/bestellen?zakelijk=1">Zakelijk bestellen</a></div>
+        </div>
+        <div class="moment priv">
+          <h3>{momenten.particulier.label}</h3>
+          <div class="rows">
+            <div class="row"><span>Bestellen tot</span><b>{momenten.particulier.deadlineTxt}</b></div>
+            <div class="row"><span>Afhalen</span><b>{momenten.particulier.ophalenTxt}</b></div>
+            <div class="row"><span>Adres</span><b>{club.adres}</b></div>
+          </div>
+          <div><a class="btn btn-o" style="border-color:#fff;color:#fff" href="/bestellen">Bestellen</a></div>
+        </div>
+      </div>
+      <div class="steps3">
+        <div class="s3"><div class="n">1</div><h3>Bestel online</h3><p>Kies kransen, stollen en/of donaties. Bestel je voor je bedrijf? Vink dan "zakelijk" aan.</p></div>
+        <div class="s3"><div class="n">2</div><h3>Betaal met iDEAL | Wero</h3><p>Veilig afrekenen via Mollie. Je krijgt direct een bevestiging per e-mail.</p></div>
+        <div class="s3"><div class="n">3</div><h3>Haal je bestelling af</h3><p>Op je afhaalmoment tussen 17:00 en 21:00 uur aan het {club.adres}, met je bevestiging bij de hand.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:20px">
+    <div class="wrap">
+      <div class="gallery">
+        <div><img src="/img/kransen-bakplaat.jpg" alt="Kerstkransen op de bakplaat" /></div>
+        <div><img src="/img/stollen-plank.jpg" alt="Kerststollen" /></div>
+        <div><img src="/img/stollen-rij.jpg" alt="Kerststollen op een rij" /></div>
+      </div>
+      <div class="clubs" style="margin-top:40px">
+        <div>
+          <div class="eyebrow">Wie organiseert dit?</div>
+          <h2>{goedeDoel.titel}</h2>
+          <p>{goedeDoel.intro}</p>
+        </div>
+        <div class="clublist">{club.clubs.map((c) => <div>{c}</div>)}</div>
+      </div>
+    </div>
+  </section>
+</Base>

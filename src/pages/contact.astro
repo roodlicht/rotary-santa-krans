@@ -1,0 +1,43 @@
+---
+export const prerender = false;
+import Base from '../layouts/Base.astro';
+import { club, momenten } from '../config/site';
+const verzonden = Astro.url.searchParams.get('verzonden') === '1';
+---
+<Base title="Contact" active="contact" description="Vragen over je bestelling bij Rotary Santa Krans? Mail ons of gebruik het contactformulier.">
+  <section class="wrap page-hero">
+    <div class="eyebrow">Contact</div>
+    <h1>Vragen over je bestelling?</h1>
+    <p>Mail ons of gebruik het formulier. We reageren zo snel mogelijk.</p>
+  </section>
+  <section class="wrap split">
+    <div class="infocard">
+      <h3>E-mail</h3>
+      <a href={`mailto:${club.contactEmail}`} style="font-family:'Young Serif';font-size:26px">{club.contactEmail}</a>
+      <div class="row"><span>Afhaaladres</span><span>{club.adres}</span></div>
+      <div class="row"><span>Bedrijven</span><span>di 8 dec, 17:00 – 21:00</span></div>
+      <div class="row"><span>Particulieren</span><span>zo 20 dec, 17:00 – 21:00</span></div>
+      <div style="margin-top:8px"><a class="btn btn-o" href={club.maps} target="_blank" rel="noopener">Route plannen ↗</a></div>
+    </div>
+    {verzonden ? (
+      <div class="panel success">
+        <div class="big">✓</div>
+        <h2>Bedankt!</h2>
+        <p class="intro" style="margin:0">We nemen zo snel mogelijk contact met je op.</p>
+      </div>
+    ) : (
+      <form class="panel" method="post" action="/api/contact">
+        <h2>Stuur een bericht</h2>
+        <div style="display:grid;gap:14px;margin-top:20px">
+          <div class="grid2">
+            <label class="field">Naam<input name="naam" required /></label>
+            <label class="field">E-mail<input type="email" name="email" required /></label>
+          </div>
+          <label class="field">Bestelnummer (optioneel)<input name="ordernummer" placeholder="SK-2026-…" /></label>
+          <label class="field">Bericht<textarea name="bericht" rows="5" required></textarea></label>
+        </div>
+        <div class="panel-nav"><span></span><button class="btn btn-r" type="submit">Verstuur</button></div>
+      </form>
+    )}
+  </section>
+</Base>

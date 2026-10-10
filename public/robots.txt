@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /beheer
+Disallow: /api/
+Disallow: /bedankt
+
+Sitemap: https://www.rotarykerstkrans.nl/sitemap-index.xml

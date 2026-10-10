@@ -1,0 +1,92 @@
+---
+import '../styles/global.css';
+import { club, seo } from '../config/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  active?: 'home' | 'bestellen' | 'contact';
+  jsonLd?: Record<string, any> | Record<string, any>[];
+  noindex?: boolean;
+}
+const { title, description, active, jsonLd, noindex = false } = Astro.props;
+const paginaTitel = title ? `${title} · ${club.naam}` : seo.titel;
+const paginaOmschrijving = description || seo.beschrijving;
+const canonical = new URL(Astro.url.pathname, Astro.site || Astro.url.origin).href;
+const ogImage = new URL(seo.ogImage, Astro.site || Astro.url.origin).href;
+const links: [string, string, string][] = [
+  ['/', 'Home', 'home'],
+  ['/bestellen', 'Bestellen', 'bestellen'],
+  ['/contact', 'Contact', 'contact'],
+];
+---
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{paginaTitel}</title>
+    <meta name="description" content={paginaOmschrijving} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={paginaTitel} />
+    <meta property="og:description" content={paginaOmschrijving} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="nl_NL" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/youngserif-latin.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/worksans-latin.woff2" crossorigin />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body>
+    <header class="nav">
+      <div class="wrap nav-in">
+        <a href="/" aria-label={club.naam}><img class="logo" src="/img/logo.webp" alt={club.naam} width="320" height="72" /></a>
+        <nav class="nav-links">
+          {links.map(([href, label, id]) => <a href={href} class={active === id ? 'on' : ''}>{label}</a>)}
+        </nav>
+        <a class="btn btn-r nav-cta" href="/bestellen" style="padding:10px 20px">Bestel nu</a>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="foot">
+      <div class="wrap">
+        <div class="foot-grid">
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <div class="foot-logo"><img src="/img/logo.webp" alt={club.naam} height="28" /></div>
+            <div class="foot-big">Een lekkere kerst, voor een goed doel.</div>
+          </div>
+          <div>
+            <h4>Afhalen</h4>
+            <ul>
+              <li>{club.adres}</li>
+              <li>Bedrijven: di 8 december</li>
+              <li>Particulieren: zo 20 december</li>
+              <li>17:00 – 21:00 uur</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Contact</h4>
+            <ul>
+              <li><a href={`mailto:${club.contactEmail}`}>{club.contactEmail}</a></li>
+              <li><a href="/bestellen">Bestellen</a></li>
+              <li><a href="/factuur-opvragen">Factuur opvragen</a></li>
+              <li><a href="/contact">Contactformulier</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="foot-bottom">
+          <span>{club.organisatie}</span>
+          <span>Betalen via iDEAL | Wero (Mollie)</span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

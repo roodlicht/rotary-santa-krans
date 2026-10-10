@@ -1,0 +1,60 @@
+import nodemailer from 'nodemailer';
+import { club, factuur } from '../config/site';
+import { euroPrefix } from './money';
+import { maakFactuurPdf } from './invoice';
+import type { OrderRow, ItemRow } from './orders';
+
+const heeftSmtp = !!process.env.SMTP_HOST;
+const transporter = heeftSmtp
+  ? nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 587),
+      secure: Number(process.env.SMTP_PORT) === 465,
+      auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
+    })
+  : null;
+const FROM = process.env.SMTP_FROM || `${club.naam} <${factuur.email}>`;
+
+/** Bevestiging + factuur-PDF naar de besteller (punt 11, 13). Bestelnummer prominent (punt 7). */
+export async function stuurFactuur(order: OrderRow, items: ItemRow[]): Promise<void> {
+  const pdf = await maakFactuurPdf(order, items);
+  const tekst = [
+    `Beste ${order.naam.split(' ')[0]},`,
+    '',
+    `Hartelijk dank voor je bestelling bij ${club.naam}. Je factuur zit als bijlage bij deze e-mail.`,
+    '',
+    `===============================`,
+    `  JE BESTELNUMMER: ${order.id}`,
+    `===============================`,
+    `Bewaar dit nummer. Je hebt het samen met je e-mailadres nodig als je later`,
+    `je factuur opnieuw wilt opvragen via de website.`,
+    '',
+    `Totaal betaald: ${euroPrefix(order.totaal_cent)}`,
+    ...(order.ophaal_label
+      ? [`Afhalen: ${order.ophaal_label}`, `Adres: ${club.adres}`, `Neem je bestelnummer mee.`]
+      : ['Je hebt alleen een donatie gedaan — er hoeft niets te worden afgehaald.']),
+    '',
+    'De volledige opbrengst gaat naar het goede doel. Hartelijk dank voor je steun!',
+    '',
+    `Met vriendelijke groet,`,
+    club.organisatie,
+  ].join('\n');
+
+  const message = {
+    from: FROM,
+    to: order.email,
+    subject: `Je bevestiging en factuur — ${order.id}`,
+    text: tekst,
+    attachments: [{ filename: `factuur-${order.id}.pdf`, content: pdf }],
+  };
+  if (!transporter) { console.log(`[mail] (dev, niet verstuurd) factuur ${order.id} → ${order.email}`); return; }
+  await transporter.sendMail(message);
+}
+
+/** Contactformulier-bericht naar de organisatie (reply-to = afzender). */
+export async function stuurContact(naam: string, email: string, bericht: string, ordernr?: string): Promise<void> {
+  const tekst = [`Naam: ${naam}`, `E-mail: ${email}`, ordernr ? `Ordernummer: ${ordernr}` : '', '', bericht].join('\n');
+  const message = { from: FROM, to: club.contactEmail, replyTo: email, subject: `Contactformulier${ordernr ? ' · ' + ordernr : ''} — ${naam}`, text: tekst };
+  if (!transporter) { console.log(`[mail] (dev, niet verstuurd) contact van ${email}`); return; }
+  await transporter.sendMail(message);
+}

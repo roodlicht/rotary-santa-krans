@@ -1,0 +1,24 @@
+---
+export const prerender = false;
+import Base from '../layouts/Base.astro';
+import { club } from '../config/site';
+const verstuurd = Astro.url.searchParams.get('verstuurd') === '1';
+---
+<Base title="Factuur opvragen" description="Vraag je factuur van Rotary Santa Krans opnieuw per e-mail aan.">
+  <section class="wrap page-hero">
+    <div class="eyebrow">Factuur</div>
+    <h1>Factuur opnieuw aanvragen</h1>
+    <p>Vul je bestelnummer en e-mailadres in. We sturen de factuur opnieuw naar het opgegeven adres.</p>
+  </section>
+  <section class="wrap" style="max-width:620px;margin-bottom:80px">
+    {verstuurd && <div class="notice" style="background:#e3f0e3;margin-bottom:16px">Als de gegevens overeenkomen met een betaalde bestelling, is de factuur zojuist verstuurd. Controleer je mailbox (en spam).</div>}
+    <form class="panel" method="post" action="/api/factuur-opvragen">
+      <div style="display:grid;gap:14px">
+        <label class="field">Bestelnummer<input name="ordernummer" placeholder="SK-2026-0001" required /></label>
+        <label class="field">E-mailadres van de bestelling<input type="email" name="email" required /></label>
+      </div>
+      <div class="panel-nav"><span></span><button class="btn btn-r" type="submit">Factuur opnieuw versturen</button></div>
+    </form>
+    <p style="margin-top:20px;color:var(--muted);font-size:15px">Lukt het niet? Mail ons via <a href={`mailto:${club.contactEmail}`}>{club.contactEmail}</a>.</p>
+  </section>
+</Base>

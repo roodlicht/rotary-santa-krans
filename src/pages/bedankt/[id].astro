@@ -1,0 +1,64 @@
+---
+export const prerender = false;
+import Base from '../../layouts/Base.astro';
+import { getOrder, getItems } from '../../lib/orders';
+import { euroPrefix } from '../../lib/money';
+import { testmodus } from '../../lib/mollie';
+import { momenten, club, type Klanttype } from '../../config/site';
+
+const { id } = Astro.params;
+const order = id ? getOrder(id) : undefined;
+const items = order ? getItems(order.id) : [];
+const sim = Astro.url.searchParams.get('sim') === '1';
+const toonSim = testmodus && sim && order && order.status !== 'paid';
+const moment = order?.ophaal_type ? momenten[order.ophaal_type as Klanttype] : null;
+const voornaam = order?.naam.split(' ')[0] || '';
+---
+<Base title="Bedankt" noindex={true}>
+  <section class="wrap" style="padding-top:56px;padding-bottom:80px">
+    {!order && <div class="panel"><h2>Bestelling niet gevonden</h2><p class="intro">Controleer de link of neem contact op via {club.contactEmail}.</p></div>}
+
+    {order && toonSim && (
+      <div class="panel">
+        <div class="notice">Testmodus — er is geen echte betaling. Kies de uitkomst om de flow te testen.</div>
+        <h2 style="margin-top:14px">Betaling simuleren</h2>
+        <p class="intro">Bestelling {order.id} · totaal {euroPrefix(order.totaal_cent)}</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <form method="post" action="/api/sim"><input type="hidden" name="orderId" value={order.id} /><input type="hidden" name="resultaat" value="paid" /><button class="btn btn-r" type="submit">Markeer als betaald</button></form>
+          <form method="post" action="/api/sim"><input type="hidden" name="orderId" value={order.id} /><input type="hidden" name="resultaat" value="failed" /><button class="btn btn-o" type="submit">Betaling mislukt</button></form>
+        </div>
+      </div>
+    )}
+
+    {order && !toonSim && order.status === 'paid' && (
+      <div class="panel success">
+        <div class="big">✓</div>
+        <div class="eyebrow">Betaling gelukt · {order.id}</div>
+        <h2>Dank je wel, {voornaam}!</h2>
+        <p style="color:var(--muted)">Je bevestiging{order.klanttype === 'zakelijk' && order.bedrijfsnaam ? ' en de factuur op naam van ' + order.bedrijfsnaam : ''} {order.klanttype === 'zakelijk' ? 'zijn' : 'is'} verstuurd naar <b>{order.email}</b>.</p>
+        <div class="infocard" style="background:var(--bg)">
+          {items.map((it) => <div class="row"><span>{it.aantal}× {it.naam}</span><span>{euroPrefix(it.regel_cent)}</span></div>)}
+          <div class="row"><span><b style="color:var(--ink)">Totaal betaald</b></span><span><b>{euroPrefix(order.totaal_cent)}</b></span></div>
+        </div>
+        {moment && (
+          <div class="pickup">
+            <div class="d"><b>{moment.ophaalDag}</b><small>{moment.ophaalMaand}</small></div>
+            <div><b>Afhalen: {moment.ophalenTxt}</b><p>{club.adres}. Neem je bestelnummer {order.id} mee.</p></div>
+          </div>
+        )}
+        <div class="ctas" style="margin-top:8px">
+          <a class="btn btn-r" href="/">Terug naar home</a>
+          <a class="btn btn-o" href={`/api/factuur/${order.id}.pdf`}>Factuur downloaden (PDF)</a>
+        </div>
+      </div>
+    )}
+
+    {order && !toonSim && order.status !== 'paid' && (
+      <div class="panel">
+        <h2>Betaling nog niet afgerond</h2>
+        <p class="intro">De status van bestelling {order.id} is op dit moment: <b>{order.status}</b>. Als je zojuist hebt betaald, kan het even duren — ververs deze pagina. Lukt het niet, begin dan opnieuw.</p>
+        <a class="btn btn-o" href="/bestellen">Terug naar bestellen</a>
+      </div>
+    )}
+  </section>
+</Base>

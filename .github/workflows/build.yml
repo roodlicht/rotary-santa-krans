@@ -1,0 +1,23 @@
+name: Build check
+
+# Draait bij elke push en pull request: bouwt de site zodat je fouten
+# (bijv. een typefout in prijzen of afhaaldata in src/config/site.ts) ziet
+# vóór je naar Plesk uitrolt.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build

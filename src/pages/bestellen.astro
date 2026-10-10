@@ -1,0 +1,224 @@
+---
+export const prerender = false;
+import Base from '../layouts/Base.astro';
+import { producten, momenten, betaling, club } from '../config/site';
+import { euroPrefix } from '../lib/money';
+
+const krans = producten.find((p) => p.id === 'krans')!;
+const stol = producten.find((p) => p.id === 'stol')!;
+const donatie = producten.find((p) => p.id === 'donatie')!;
+const startZakelijk = Astro.url.searchParams.get('zakelijk') === '1';
+
+const clientData = {
+  prices: { krans: krans.prijsCent, stol: stol.prijsCent, donatie: donatie.prijsCent },
+  moments: {
+    particulier: { label: momenten.particulier.label, deadlineIso: momenten.particulier.deadlineIso, deadlineTxt: momenten.particulier.deadlineTxt, pickupTxt: momenten.particulier.ophalenTxt, day: momenten.particulier.ophaalDag, mon: momenten.particulier.ophaalMaand },
+    zakelijk: { label: momenten.zakelijk.label, deadlineIso: momenten.zakelijk.deadlineIso, deadlineTxt: momenten.zakelijk.deadlineTxt, pickupTxt: momenten.zakelijk.ophalenTxt, day: momenten.zakelijk.ophaalDag, mon: momenten.zakelijk.ophaalMaand },
+  },
+  address: club.adres,
+  startZakelijk,
+};
+---
+<Base title="Bestellen" active="bestellen" noindex={true}>
+  <section class="wrap page-hero">
+    <div class="eyebrow">Bestellen</div>
+    <h1>Bestel je kerstkrans of kerststol</h1>
+    <p>€17 per stuk, donatie €12,50. Particulieren bestellen tot {momenten.particulier.deadlineTxt}; bedrijven tot {momenten.zakelijk.deadlineTxt}.</p>
+  </section>
+
+  <section class="wrap shop">
+    <form id="shop" method="post" action="/api/checkout">
+      <input type="hidden" name="klanttype" id="f-klanttype" value={startZakelijk ? 'zakelijk' : 'particulier'} />
+      <input type="hidden" name="aantal_krans" id="f-krans" value="0" />
+      <input type="hidden" name="aantal_stol" id="f-stol" value="0" />
+      <input type="hidden" name="aantal_donatie" id="f-donatie" value="0" />
+
+      <div class="stepbar">
+        <div class="stp on" data-stp="0"><i>1</i>Bestelling</div>
+        <div class="stp" data-stp="1"><i>2</i>Gegevens</div>
+        <div class="stp" data-stp="2"><i>3</i>Betalen</div>
+      </div>
+
+      <!-- STAP 0: Bestelling -->
+      <div class="panel" data-panel="0">
+        <h2>Wat wil je bestellen?</h2>
+        <p class="intro">Geef per product het aantal op.</p>
+        <label class="toggle" id="biz-toggle">
+          <input type="checkbox" id="biz" />
+          <span><b>Ik bestel zakelijk</b><small>Factuur op bedrijfsnaam. Bestellen tot {momenten.zakelijk.deadlineTxt}, afhalen op {momenten.zakelijk.ophalenTxt}.</small></span>
+        </label>
+        <div class="closed" id="closed-banner" hidden></div>
+
+        {[krans, stol, donatie].map((p) => (
+          <div class="line">
+            {p.id === 'donatie'
+              ? <div class="ph-don">♥</div>
+              : <img src={`/img/${p.afbeelding}`} alt="" style={p.contain ? 'object-fit:contain' : ''} />}
+            <div><h3>{p.naam}</h3><p>{p.omschrijving} <span class="pr">{euroPrefix(p.prijsCent)}</span></p></div>
+            <div class="stepper" data-prod={p.id}>
+              <button type="button" class="dec" aria-label="minder">−</button>
+              <input inputmode="numeric" class="qty" value="0" aria-label={`aantal ${p.naam}`} />
+              <button type="button" class="inc" aria-label="meer">+</button>
+            </div>
+          </div>
+        ))}
+
+        <div class="pickup" id="pickup-card" hidden>
+          <div class="d"><b id="pk-day">20</b><small id="pk-mon">dec</small></div>
+          <div><b id="pk-txt">Afhalen</b><p>{club.adres}</p></div>
+        </div>
+      </div>
+
+      <!-- STAP 1: Gegevens -->
+      <div class="panel" data-panel="1" hidden>
+        <h2>Je gegevens</h2>
+        <p class="intro" id="gegevens-intro"></p>
+        <div style="display:grid;gap:14px">
+          <div id="biz-fields" hidden style="display:grid;gap:14px">
+            <label class="field" data-f="company">Bedrijfsnaam<input id="company" name="bedrijfsnaam" autocomplete="organization" /></label>
+            <label class="field" data-f="straat">Straat en huisnummer<input id="straat" name="straat" autocomplete="street-address" /></label>
+            <div class="grid2">
+              <label class="field" data-f="postcode">Postcode<input id="postcode" name="postcode" autocomplete="postal-code" /></label>
+              <label class="field" data-f="plaats">Plaats<input id="plaats" name="plaats" autocomplete="address-level2" /></label>
+            </div>
+          </div>
+          <label class="field" data-f="name"><span id="name-label">Naam</span><input id="name" name="naam" /></label>
+          <div class="grid2">
+            <label class="field" data-f="email">E-mailadres<input id="email" name="email" type="email" /></label>
+            <label class="field" data-f="phone">Telefoonnummer<input id="phone" name="telefoon" type="tel" /></label>
+          </div>
+          <label class="field">Opmerking (optioneel)<textarea id="note" name="opmerking" rows="3"></textarea></label>
+        </div>
+        <label class="check"><input type="checkbox" id="agree" /><span id="agree-txt">Ik ga akkoord met de voorwaarden.</span></label>
+      </div>
+
+      <!-- STAP 2: Betalen -->
+      <div class="panel" data-panel="2" hidden>
+        <div class="paytop">
+          <div class="ideal">iDEAL<br /><span style="font-size:10px;font-weight:600">Wero</span></div>
+          <div><h2 style="font-size:28px">Betalen met iDEAL | Wero</h2><p style="color:var(--muted)">Te betalen: <b id="pay-total">€ 0,00</b></p></div>
+        </div>
+        <p class="mollie">{betaling.uitleg} Je wordt doorgestuurd naar je eigen bank om de betaling te bevestigen. iDEAL gaat in stappen over naar Wero.</p>
+      </div>
+
+      <div class="panel-nav">
+        <button type="button" class="btn btn-o" id="back" hidden>← Terug</button>
+        <span id="hint" class="hint" hidden></span>
+        <button type="button" class="btn btn-r" id="next">Verder →</button>
+        <button type="submit" class="btn btn-r" id="pay" hidden>Betaal <span id="pay-btn-total">€ 0,00</span></button>
+      </div>
+    </form>
+
+    <aside class="summary">
+      <h3>Je bestelling</h3>
+      <div id="sum-lines"><div style="opacity:.7;font-size:15px;padding:8px 0">Nog niets gekozen.</div></div>
+      <div class="stotal"><span>Totaal</span><b id="sum-total">€ 0,00</b></div>
+      <div class="snote" id="sum-note">Particulier</div>
+    </aside>
+  </section>
+
+  <script type="application/json" id="shop-data" set:html={JSON.stringify(clientData)}></script>
+  <script is:inline>
+    (function () {
+      const D = JSON.parse(document.getElementById('shop-data').textContent);
+      const form = document.getElementById('shop');
+      const euro = (c) => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const LBL = { krans: 'Kerstkrans', stol: 'Kerststol', donatie: 'Donatie' };
+
+      let step = 0;
+      let biz = !!D.startZakelijk;
+      const qty = { krans: 0, stol: 0, donatie: 0 };
+      let tried = false;
+
+      const $ = (id) => document.getElementById(id);
+      const panels = Array.from(document.querySelectorAll('[data-panel]'));
+      const stps = Array.from(document.querySelectorAll('.stp'));
+
+      function mom() { return D.moments[biz ? 'zakelijk' : 'particulier']; }
+      function closed() { return Date.now() > new Date(mom().deadlineIso).getTime(); }
+      function products() { return qty.krans + qty.stol; }
+      function total() { return qty.krans * D.prices.krans + qty.stol * D.prices.stol + qty.donatie * D.prices.donatie; }
+      function emailOk() { return /\S+@\S+\.\S+/.test($('email').value); }
+
+      function valid(s) {
+        if (s === 0) return total() > 0 && !(closed() && products() > 0);
+        if (s === 1) return $('name').value.trim() && emailOk() && $('phone').value.trim().length >= 8 && (!biz || ($('company').value.trim() && $('straat').value.trim() && $('postcode').value.trim() && $('plaats').value.trim())) && $('agree').checked;
+        return true;
+      }
+      const hints = () => [
+        closed() && products() > 0 ? 'De besteltermijn is verlopen.' : 'Kies minimaal één product of donatie.',
+        biz ? 'Vul de bedrijfsnaam, het factuuradres, contactpersoon, e-mail en telefoon in en ga akkoord.' : 'Vul naam, e-mail en telefoon in en ga akkoord.',
+      ];
+
+      function renderSummary() {
+        const lines = [['krans'], ['stol'], ['donatie']].filter(([k]) => qty[k] > 0);
+        const box = $('sum-lines');
+        box.innerHTML = lines.length ? '' : '<div style="opacity:.7;font-size:15px;padding:8px 0">Nog niets gekozen.</div>';
+        for (const [k] of lines) {
+          const row = document.createElement('div');
+          row.className = 'sline';
+          row.innerHTML = '<span>' + qty[k] + '× ' + LBL[k] + '</span><span>' + euro(qty[k] * D.prices[k]) + '</span>';
+          box.appendChild(row);
+        }
+        $('sum-total').textContent = euro(total());
+        $('pay-total').textContent = euro(total());
+        $('pay-btn-total').textContent = euro(total());
+        $('sum-note').textContent = (biz ? 'Zakelijk · factuur op bedrijfsnaam' : 'Particulier') + (products() > 0 ? ' · afhalen ' + mom().pickupTxt : '');
+        // sync hidden fields
+        $('f-krans').value = qty.krans; $('f-stol').value = qty.stol; $('f-donatie').value = qty.donatie;
+        $('f-klanttype').value = biz ? 'zakelijk' : 'particulier';
+      }
+
+      function renderStep0() {
+        const m = mom();
+        $('biz-toggle').classList.toggle('on', biz);
+        $('biz').checked = biz;
+        const cb = $('closed-banner');
+        if (closed()) { cb.hidden = false; cb.textContent = 'De besteltermijn voor ' + m.label.toLowerCase() + ' is verlopen. Doneren kan nog wel.'; }
+        else cb.hidden = true;
+        const pc = $('pickup-card');
+        if (products() > 0) { pc.hidden = false; $('pk-day').textContent = m.day; $('pk-mon').textContent = m.mon; $('pk-txt').textContent = 'Afhalen: ' + m.pickupTxt; }
+        else pc.hidden = true;
+      }
+      function renderStep1() {
+        $('biz-fields').hidden = !biz;
+        $('name-label').textContent = biz ? 'Contactpersoon' : 'Naam';
+        $('gegevens-intro').innerHTML = (biz ? 'Je bestelt zakelijk. De factuur komt op naam van het bedrijf.' : 'Hiermee sturen we je de bevestiging.');
+        $('agree-txt').textContent = 'Ik ga akkoord met de voorwaarden' + (products() > 0 ? ' en haal de bestelling af op het afhaalmoment' : '') + '.';
+      }
+
+      function show() {
+        panels.forEach((p) => { p.hidden = +p.dataset.panel !== step; });
+        stps.forEach((s, i) => { s.classList.toggle('on', i === step); s.classList.toggle('done', i < step); s.querySelector('i').textContent = i < step ? '✓' : i + 1; });
+        $('back').hidden = step === 0;
+        $('next').hidden = step === 2;
+        $('pay').hidden = step !== 2;
+        const h = $('hint');
+        if (tried && !valid(step) && step < 2) { h.hidden = false; h.textContent = hints()[step]; } else h.hidden = true;
+        if (step === 0) renderStep0();
+        if (step === 1) renderStep1();
+      }
+      function go(n) { tried = false; step = n; window.scrollTo({ top: 0, behavior: 'smooth' }); show(); }
+      function next() { if (valid(step)) go(step + 1); else { tried = true; show(); } }
+
+      // steppers
+      document.querySelectorAll('.stepper').forEach((s) => {
+        const k = s.dataset.prod, inp = s.querySelector('.qty');
+        const set = (v) => { qty[k] = Math.max(0, Math.min(999, v | 0)); inp.value = qty[k]; renderSummary(); if (step === 0) renderStep0(); };
+        s.querySelector('.dec').addEventListener('click', () => set(qty[k] - 1));
+        s.querySelector('.inc').addEventListener('click', () => set(qty[k] + 1));
+        inp.addEventListener('input', () => set(parseInt(inp.value.replace(/\D/g, '')) || 0));
+      });
+      $('biz').addEventListener('change', (e) => { biz = e.target.checked; renderStep0(); renderSummary(); });
+      ['name', 'email', 'phone', 'company', 'straat', 'postcode', 'plaats', 'agree'].forEach((id) => $(id).addEventListener('input', () => { if (tried) show(); }));
+      $('next').addEventListener('click', next);
+      $('back').addEventListener('click', () => go(step - 1));
+      form.addEventListener('submit', (e) => {
+        if (!valid(0) || !valid(1)) { e.preventDefault(); step = valid(0) ? 1 : 0; tried = true; show(); return; }
+        $('pay').disabled = true; $('pay').textContent = 'Doorsturen naar iDEAL | Wero…';
+      });
+
+      renderSummary(); show();
+    })();
+  </script>
+</Base>
