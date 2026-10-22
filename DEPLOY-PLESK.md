@@ -8,16 +8,16 @@ GitHub-webeditor aan te passen) — Plesk haalt ze op, bouwt en herstart.
 
 ### 1. Node.js-extensie
 Zorg dat in Plesk de **Node.js**-extensie beschikbaar is voor het domein
-(Node 20 of hoger). Het domein moet publiek op **https** staan (nodig voor de
+(Node 22.23 of hoger; wij gebruiken 24). Het domein moet publiek op **https** staan (nodig voor de
 Mollie-webhook).
 
 ### 2. Git koppelen
 Plesk → **Websites & Domains → (jouw domein) → Git**:
-- Repository: `https://github.com/<jouw-account>/rotary-santa-krans.git`
+- Repository: `https://github.com/roodlicht/rotary-santa-krans` (publiek, dus geen inlog nodig)
 - Branch: `main`
-- Deployment-pad: bijvoorbeeld `santakrans` (een submap, niet `httpdocs`;
-  we serveren via Node, niet via statische bestanden).
-- Zet "automatisch uitrollen" aan als je wilt dat elke push meteen live gaat.
+- Deployment directory: `/httpdocs`
+- Deployment mode: `Automatic`
+- **Enable post deployment actions** aan, met: `bash deploy.sh`
 
 > **Privé-repo?** Plesk toont bij het koppelen een **deploy key** (publieke
 > SSH-sleutel). Kopieer die naar GitHub → repo → **Settings → Deploy keys →
@@ -27,10 +27,16 @@ Plesk → **Websites & Domains → (jouw domein) → Git**:
 
 ### 3. Node.js-app instellen
 Plesk → **Node.js** (bij hetzelfde domein):
-- **Application Root**: hetzelfde pad als het Git-deployment-pad.
+- **Node.js-versie**: 24 (moet gelijk zijn aan `.node-version`)
+- **Document Root**: `/httpdocs/dist/client` (alleen publieke bestanden; zo
+  serveert de webserver nooit `package.json`, `deploy.sh` of de broncode)
+- **Application Root**: `/httpdocs` (let op: Plesk schuift dit mee als je de
+  Document Root wijzigt; zet het daarna terug)
 - **Application Startup File**: `dist/server/entry.mjs`
 - **Application Mode**: `production`
-- **Node.js-versie**: 20 of hoger.
+
+> Staat de Node.js-tegel niet bij Dev Tools? Dan moet Node.js nog aan voor
+> het abonnement: Subscriptions → domein → Customize → Node.js aanvinken.
 
 ### 4. Omgevingsvariabelen
 Bij de Node.js-instellingen → **Custom environment variables**. Zie
@@ -53,11 +59,22 @@ bash deploy.sh
 Dit draait `npm ci`, `npm run build` en herstart de Node-app (via
 `tmp/restart.txt`). Zie `deploy.sh`.
 
+Deze server gebruikt **nodenv** voor Node. In de deploy-shell staan de
+nodenv-shims niet vanzelf op PATH en is er geen versie gekozen; `deploy.sh`
+regelt beide (shims op PATH, versie uit `.node-version`). Handmatig bouwen via
+SSH: `export NODENV_VERSION=24` en dan `npm ci && npm run build`.
+
 ### 6. Eerste uitrol
 1. In Plesk → Git: klik **Pull / Deploy** (haalt de code op en draait `deploy.sh`).
 2. In Plesk → Node.js: klik **Enable Node.js** / **Restart App**.
 3. Open het domein — de site hoort te draaien.
-4. Controleer `/beheer` (met je `ADMIN_PASSWORD`).
+4. Controleer `/beheer` (met je `ADMIN_PASSWORD`). Zie je "Beheer is nog niet
+   ingesteld", dan ontbreken `ADMIN_PASSWORD` of `SESSION_SECRET`.
+
+### Cloudflare
+Het domein loopt via Cloudflare. Zet SSL/TLS op **Full** (bij **Flexible**
+ontstaat een eindeloze redirect-loop). Na een Let's Encrypt-certificaat in
+Plesk kun je naar **Full (strict)**.
 
 De Mollie-webhook (`/api/webhook/mollie`) wordt automatisch meegestuurd; er is
 geen aparte configuratie in het Mollie-dashboard nodig, zolang het domein
@@ -73,7 +90,7 @@ factuurafzender.
    bewerken → commit).
 2. De **Build check** (GitHub Actions) bouwt automatisch mee; blijft die groen,
    dan is je wijziging foutloos.
-3. Plesk rolt uit (automatisch bij een push, of klik **Deploy**). `deploy.sh`
+3. Plesk → Git → **Pull now** (zonder GitHub-webhook ziet Plesk een push niet vanzelf). `deploy.sh`
    bouwt opnieuw met de nieuwe waarden en herstart de app.
 
 > Let op: na een wijziging in de config is een **nieuwe uitrol (build) nodig**;

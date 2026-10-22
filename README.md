@@ -26,7 +26,7 @@ In testmodus (geen MOLLIE_API_KEY) wordt de betaling gesimuleerd. Beheer: /behee
 | Database | `data/orders.db` |
 
 ## Productie op Plesk
-1. Node.js-extensie aanzetten (Node 20+); **app-processen = 1** (SQLite-schrijven).
+1. Node.js-extensie aanzetten (Node 24); **app-processen = 1** (SQLite-schrijven).
 2. Env vars: `MOLLIE_API_KEY`, `ADMIN_PASSWORD`, `SESSION_SECRET`, `SITE_URL`, `SMTP_*`.
 3. `npm install && npm run build`; startbestand `dist/server/entry.mjs` (Passenger).
 4. Mollie-webhook (`/api/webhook/mollie`) gaat automatisch mee; domein moet publiek op https staan.
