@@ -82,17 +82,23 @@ publiek op https bereikbaar is.
 
 ## E-mail (facturen en contactformulier)
 De mail van het domein draait op deze Plesk-server zelf (MX, SPF en DKIM
-wijzen hierheen). De app levert mail af via het lokale `sendmail`-programma,
-zoals PHP-sites op Plesk dat ook doen:
+wijzen hierheen). De app geeft mail via SMTP aan de lokale mailserver:
 
 | Variabele | Waarde |
 | --- | --- |
-| `MAIL_VIA` | `sendmail` |
+| `SMTP_HOST` | `127.0.0.1` |
+| `SMTP_PORT` | `25` |
 | `SMTP_FROM` | `Rotary Santa Krans <support@rotarykerstkrans.nl>` |
 
-Geen wachtwoord nodig. Niet via `SMTP_HOST=127.0.0.1`: de mailserver weigert
-dan mail naar andere domeinen ("Relay access denied"), dus klanten krijgen
-geen factuur. `SMTP_HOST`/`SMTP_PORT` mogen weg; `MAIL_VIA` gaat voor.
+Geen wachtwoord nodig, maar de server moet op de **witte lijst** van de
+mailserver staan: Tools & Settings → Mail Server Settings → White List →
+`127.0.0.1/8`. Zonder die regel weigert de mailserver mail naar andere
+domeinen ("Relay access denied") en krijgen klanten geen factuur.
+
+Niet `MAIL_VIA=sendmail` op deze server: SELinux verbiedt het
+sendmail-hulpprogramma van Plesk om de aanroepende webapp uit te lezen. De
+mail gaat dan wel de deur uit, maar de site krijgt een foutcode en meldt
+"versturen mislukt" (met dubbele mails als bezoekers het opnieuw proberen).
 
 Bij elke betaalde bestelling gaat er ook een melding naar support@ (uit te
 zetten via `meldingen` in `src/config/site.ts`). Zorg dat `support@rotarykerstkrans.nl`
