@@ -114,6 +114,12 @@ export const betaling = {
   uitleg: 'Je betaalt veilig met iDEAL of Wero via Mollie.',
 };
 
+/* Meldingen aan de organisatie. */
+export const meldingen = {
+  // Bij elke betaalde bestelling een mail naar het contactadres (support@).
+  nieuweBestelling: true,
+};
+
 /*
  * Factuurafzender (punt 12). Geen btw (punt 11).
  */

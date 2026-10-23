@@ -1,16 +1,22 @@
 import nodemailer from 'nodemailer';
-import { club, factuur, goedeDoel } from '../config/site';
+import { club, factuur, goedeDoel, meldingen } from '../config/site';
 import { euroPrefix } from './money';
 import { maakFactuurPdf } from './invoice';
 import type { OrderRow, ItemRow } from './orders';
 
-const heeftSmtp = !!process.env.SMTP_HOST;
+// MAIL_VIA=sendmail: aflevering via het lokale sendmail-programma (Plesk). Zo
+// versturen ook PHP-sites; de relay-regels van poort 25 gelden dan niet en Plesk
+// ondertekent met DKIM. Anders SMTP als SMTP_HOST is ingesteld.
+const viaSendmail = process.env.MAIL_VIA === 'sendmail';
+const heeftSmtp = !viaSendmail && !!process.env.SMTP_HOST;
 // Mailserver op dezelfde machine (Plesk): geen TLS, want het certificaat hoort bij
 // mail.<domein> en niet bij localhost, en de mail verlaat de server hier nog niet.
 const lokaal = ['localhost', '127.0.0.1', '::1'].includes(process.env.SMTP_HOST || '');
 // nodemailer zoekt hostnamen via DNS op, en daar staat 'localhost' niet in.
 const smtpHost = process.env.SMTP_HOST === 'localhost' ? '127.0.0.1' : process.env.SMTP_HOST;
-const transporter = heeftSmtp
+const transporter = viaSendmail
+  ? nodemailer.createTransport({ sendmail: true, newline: 'unix', path: process.env.SENDMAIL_PATH || '/usr/sbin/sendmail' })
+  : heeftSmtp
   ? nodemailer.createTransport({
       host: smtpHost,
       port: Number(process.env.SMTP_PORT || 587),
@@ -54,6 +60,38 @@ export async function stuurFactuur(order: OrderRow, items: ItemRow[]): Promise<v
     attachments: [{ filename: `factuur-${order.id}.pdf`, content: pdf }],
   };
   if (!transporter) { console.log(`[mail] (dev, niet verstuurd) factuur ${order.id} → ${order.email}`); return; }
+  await transporter.sendMail(message);
+}
+
+/** Melding aan de organisatie bij een betaalde bestelling (reply-to = besteller). */
+export async function stuurBestelmelding(order: OrderRow, items: ItemRow[]): Promise<void> {
+  if (!meldingen.nieuweBestelling) return;
+  const regels = items.map((i) => `  ${i.aantal}× ${i.naam}  ${euroPrefix(i.regel_cent)}`);
+  const tekst = [
+    `Nieuwe betaalde bestelling: ${order.id}`,
+    '',
+    order.klanttype === 'zakelijk' ? `Bedrijf:   ${order.bedrijfsnaam}` : 'Particulier',
+    ...(order.klanttype === 'zakelijk' ? [`Adres:     ${order.straat}, ${order.postcode} ${order.plaats}`] : []),
+    `Naam:      ${order.naam}`,
+    `E-mail:    ${order.email}`,
+    `Telefoon:  ${order.telefoon || '—'}`,
+    '',
+    ...regels,
+    `  Totaal   ${euroPrefix(order.totaal_cent)}`,
+    '',
+    `Afhalen:   ${order.ophaal_label || 'n.v.t. (alleen donatie)'}`,
+    ...(order.opmerking ? ['', `Opmerking: ${order.opmerking}`] : []),
+    '',
+    'Alle bestellingen: /beheer',
+  ].join('\n');
+  const message = {
+    from: FROM,
+    to: club.contactEmail,
+    replyTo: order.email,
+    subject: `Nieuwe bestelling ${order.id} — ${order.bedrijfsnaam || order.naam} — ${euroPrefix(order.totaal_cent)}`,
+    text: tekst,
+  };
+  if (!transporter) { console.log(`[mail] (dev, niet verstuurd) bestelmelding ${order.id}`); return; }
   await transporter.sendMail(message);
 }
 

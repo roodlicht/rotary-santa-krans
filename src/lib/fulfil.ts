@@ -1,5 +1,5 @@
 import { getOrder, getItems, markeerStatus } from './orders';
-import { stuurFactuur } from './mail';
+import { stuurFactuur, stuurBestelmelding } from './mail';
 
 /**
  * Verwerkt een betaalde bestelling: status 'paid' + factuur mailen. Idempotent
@@ -12,8 +12,11 @@ export async function verwerkBetaling(orderId: string, status: string): Promise<
     if (order.status === 'paid' && order.betaald_op) return;
     markeerStatus(orderId, 'paid');
     const verse = getOrder(orderId)!;
-    try { await stuurFactuur(verse, getItems(orderId)); }
+    const items = getItems(orderId);
+    try { await stuurFactuur(verse, items); }
     catch (e) { console.error(`[fulfil] factuur mailen mislukt voor ${orderId}:`, e); }
+    try { await stuurBestelmelding(verse, items); }
+    catch (e) { console.error(`[fulfil] bestelmelding mislukt voor ${orderId}:`, e); }
   } else if (['failed', 'canceled', 'expired'].includes(status)) {
     markeerStatus(orderId, status);
   }

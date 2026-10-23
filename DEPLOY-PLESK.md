@@ -82,15 +82,20 @@ publiek op https bereikbaar is.
 
 ## E-mail (facturen en contactformulier)
 De mail van het domein draait op deze Plesk-server zelf (MX, SPF en DKIM
-wijzen hierheen). De app geeft mail rechtstreeks aan de lokale mailserver:
+wijzen hierheen). De app levert mail af via het lokale `sendmail`-programma,
+zoals PHP-sites op Plesk dat ook doen:
 
 | Variabele | Waarde |
 | --- | --- |
-| `SMTP_HOST` | `127.0.0.1` |
-| `SMTP_PORT` | `25` |
+| `MAIL_VIA` | `sendmail` |
 | `SMTP_FROM` | `Rotary Santa Krans <support@rotarykerstkrans.nl>` |
 
-Geen `SMTP_USER`/`SMTP_PASS` nodig. Zorg dat `support@rotarykerstkrans.nl`
+Geen wachtwoord nodig. Niet via `SMTP_HOST=127.0.0.1`: de mailserver weigert
+dan mail naar andere domeinen ("Relay access denied"), dus klanten krijgen
+geen factuur. `SMTP_HOST`/`SMTP_PORT` mogen weg; `MAIL_VIA` gaat voor.
+
+Bij elke betaalde bestelling gaat er ook een melding naar support@ (uit te
+zetten via `meldingen` in `src/config/site.ts`). Zorg dat `support@rotarykerstkrans.nl`
 bestaat in Plesk → Mail (mailbox of doorsturen), want daar komen de
 contactberichten en antwoorden op facturen binnen.
 
