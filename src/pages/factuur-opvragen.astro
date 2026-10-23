@@ -3,6 +3,7 @@ export const prerender = false;
 import Base from '../layouts/Base.astro';
 import { club } from '../config/site';
 const verstuurd = Astro.url.searchParams.get('verstuurd') === '1';
+const fout = Astro.url.searchParams.get('fout') === '1';
 ---
 <Base title="Factuur opvragen" description="Vraag je factuur van Rotary Santa Krans opnieuw per e-mail aan.">
   <section class="wrap page-hero">
@@ -11,6 +12,7 @@ const verstuurd = Astro.url.searchParams.get('verstuurd') === '1';
     <p>Vul je bestelnummer en e-mailadres in. We sturen de factuur opnieuw naar het opgegeven adres.</p>
   </section>
   <section class="wrap" style="max-width:620px;margin-bottom:80px">
+    {fout && <div class="notice" style="background:#f6e0de;margin-bottom:16px">De factuur kon nu niet worden verstuurd. Probeer het later opnieuw, of mail ons via <a href={`mailto:${club.contactEmail}`}>{club.contactEmail}</a>.</div>}
     {verstuurd && <div class="notice" style="background:#e3f0e3;margin-bottom:16px">Als de gegevens overeenkomen met een betaalde bestelling, is de factuur zojuist verstuurd. Controleer je mailbox (en spam).</div>}
     <form class="panel" method="post" action="/api/factuur-opvragen">
       <div style="display:grid;gap:14px">
