@@ -1,13 +1,25 @@
 ---
 export const prerender = false;
 import Base from '../../layouts/Base.astro';
-import { getOrder, getItems } from '../../lib/orders';
+import { getOrder, getOrderMetToken, getItems } from '../../lib/orders';
 import { euroPrefix } from '../../lib/money';
-import { testmodus } from '../../lib/mollie';
+import { testmodus, haalStatus } from '../../lib/mollie';
+import { verwerkBetaling } from '../../lib/fulfil';
 import { momenten, club, type Klanttype } from '../../config/site';
 
 const { id } = Astro.params;
-const order = id ? getOrder(id) : undefined;
+const token = Astro.url.searchParams.get('t');
+let order = id ? getOrderMetToken(id, token) : undefined;
+
+// Klant komt terug van Mollie vóór de webhook binnen is: status zelf nagaan.
+if (order && order.status === 'pending' && !testmodus && order.mollie_id) {
+  try {
+    await verwerkBetaling(order.id, await haalStatus(order.mollie_id));
+    order = getOrder(order.id);
+  } catch (e) {
+    console.error(`[bedankt] status ophalen mislukt voor ${order.id}:`, e);
+  }
+}
 const items = order ? getItems(order.id) : [];
 const sim = Astro.url.searchParams.get('sim') === '1';
 const toonSim = testmodus && sim && order && order.status !== 'paid';
@@ -48,7 +60,7 @@ const voornaam = order?.naam.split(' ')[0] || '';
         )}
         <div class="ctas" style="margin-top:8px">
           <a class="btn btn-r" href="/">Terug naar home</a>
-          <a class="btn btn-o" href={`/api/factuur/${order.id}.pdf`}>Factuur downloaden (PDF)</a>
+          <a class="btn btn-o" href={`/api/factuur/${order.id}.pdf?t=${order.token}`}>Factuur downloaden (PDF)</a>
         </div>
       </div>
     )}

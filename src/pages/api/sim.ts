@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { testmodus } from '../../lib/mollie';
 import { verwerkBetaling } from '../../lib/fulfil';
+import { getOrder } from '../../lib/orders';
 
 export const prerender = false;
 
@@ -11,5 +12,5 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   const orderId = form.get('orderId')?.toString() || '';
   const resultaat = form.get('resultaat')?.toString() === 'paid' ? 'paid' : 'failed';
   await verwerkBetaling(orderId, resultaat);
-  return redirect(`/bedankt/${orderId}`, 303);
+  return redirect(`/bedankt/${orderId}?t=${getOrder(orderId)?.token ?? ''}`, 303);
 };

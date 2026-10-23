@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getOrder } from '../../../lib/orders';
-import { haalStatus } from '../../../lib/mollie';
+import { haalStatus, testmodus } from '../../../lib/mollie';
 import { verwerkBetaling } from '../../../lib/fulfil';
 
 export const prerender = false;
@@ -10,7 +10,8 @@ export const POST: APIRoute = async ({ request }) => {
   const mollieId = form.get('id')?.toString();
   if (!mollieId) return new Response('geen id', { status: 400 });
 
-  const orderId = mollieId.startsWith('test_') ? mollieId.slice(5) : undefined;
+  // test_<bestelnummer> bestaat alleen in testmodus; live zoeken we op het Mollie-id.
+  const orderId = testmodus && mollieId.startsWith('test_') ? mollieId.slice(5) : undefined;
   let order = orderId ? getOrder(orderId) : undefined;
   if (!order) {
     const { db } = await import('../../../lib/db');

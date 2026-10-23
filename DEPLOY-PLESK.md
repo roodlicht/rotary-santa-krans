@@ -80,6 +80,21 @@ De Mollie-webhook (`/api/webhook/mollie`) wordt automatisch meegestuurd; er is
 geen aparte configuratie in het Mollie-dashboard nodig, zolang het domein
 publiek op https bereikbaar is.
 
+## Mollie aanzetten
+De sleutel staat **nooit** in de code (de repo is publiek), alleen in Plesk:
+Node.js → **Custom environment variables** → `MOLLIE_API_KEY` → **Restart App**.
+
+1. Eerst je **testsleutel** (`test_…`, Mollie-dashboard → Developers → API keys).
+   Doe een proefbestelling: je komt in Mollies testscherm, kies daar "Paid".
+   Controleer dat de bedankpagina "Betaling gelukt" toont en dat de bestelling
+   in `/beheer` staat.
+2. Werkt dat, vervang hem door je **live-sleutel** (`live_…`) en herstart.
+3. Maak vóór de echte start de proefbestellingen leeg (databasebestand op
+   `DB_PATH` verwijderen, app herstarten), zodat de nummering bij 0001 begint.
+
+Welke betaalmethodes klanten zien (iDEAL, Wero) bepaal je in het
+Mollie-dashboard; de site toont alles wat daar aan staat.
+
 ## Later wijzigingen doorvoeren
 
 Bijna alles wat je per jaar aanpast staat in **`src/config/site.ts`**: prijzen,

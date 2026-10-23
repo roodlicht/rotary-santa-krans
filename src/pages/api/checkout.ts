@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
-import { maakBestelling, setMollieId, BestelFout } from '../../lib/orders';
+import { maakBestelling, setMollieId, markeerStatus, BestelFout } from '../../lib/orders';
+import { club } from '../../config/site';
 import { startBetaling } from '../../lib/mollie';
 import { getBaseUrl } from '../../lib/url';
 import type { Klanttype } from '../../config/site';
@@ -37,7 +38,17 @@ export const POST: APIRoute = async ({ request, redirect, url }) => {
   }
 
   const baseUrl = getBaseUrl(request, url);
-  const { checkoutUrl, mollieId } = await startBetaling({ orderId: order.id, totaalCent: order.totaalCent, baseUrl });
-  setMollieId(order.id, mollieId);
-  return redirect(checkoutUrl, 303);
+  try {
+    const { checkoutUrl, mollieId } = await startBetaling({ orderId: order.id, token: order.token, totaalCent: order.totaalCent, baseUrl });
+    setMollieId(order.id, mollieId);
+    return redirect(checkoutUrl, 303);
+  } catch (e) {
+    // Bv. een verkeerde Mollie-sleutel of een storing bij Mollie: geen halve bestelling laten staan.
+    console.error(`[checkout] betaling starten mislukt voor ${order.id}:`, e);
+    markeerStatus(order.id, 'failed');
+    return new Response(
+      `Betalen is op dit moment niet mogelijk. Probeer het later opnieuw, of mail ${club.contactEmail}.`,
+      { status: 502, headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
+    );
+  }
 };

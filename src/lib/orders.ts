@@ -1,3 +1,4 @@
+import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { db } from './db';
 import { producten, momenten, factuur, kransId, stolId, donatieId, type Klanttype } from '../config/site';
 
@@ -36,6 +37,7 @@ export type OrderRow = {
   totaal_cent: number;
   mollie_id: string | null;
   betaald_op: string | null;
+  token: string | null;
 };
 
 export type ItemRow = {
@@ -64,7 +66,7 @@ export function termijnVerlopen(klanttype: Klanttype, nu = new Date()): boolean 
  * donatie (geen krans/stol) is er geen ophaalmoment (punt 1). Na de deadline
  * zijn producten geweigerd, donaties niet (punt 7).
  */
-export function maakBestelling(input: OrderInput, nu = new Date()): { id: string; totaalCent: number } {
+export function maakBestelling(input: OrderInput, nu = new Date()): { id: string; totaalCent: number; token: string } {
   const regels = producten
     .map((p) => {
       const aantal = Math.max(0, Math.floor(Number(input.aantallen[p.id]) || 0));
@@ -89,12 +91,13 @@ export function maakBestelling(input: OrderInput, nu = new Date()): { id: string
   // Ophaalmoment alleen bij fysieke producten.
   const moment = aantalProducten > 0 ? momenten[input.klanttype] : null;
   const id = nieuwOrderId();
+  const token = randomBytes(16).toString('hex');
 
   const insertOrder = db.prepare(`
     INSERT INTO orders (id, created_at, status, klanttype, naam, email, telefoon, bedrijfsnaam, kvk, straat, postcode, plaats, opmerking,
-      ophaal_type, ophaal_label, ophaal_iso, subtotaal_cent, totaal_cent)
+      ophaal_type, ophaal_label, ophaal_iso, subtotaal_cent, totaal_cent, token)
     VALUES (@id, @created_at, 'pending', @klanttype, @naam, @email, @telefoon, @bedrijfsnaam, @kvk, @straat, @postcode, @plaats, @opmerking,
-      @ophaal_type, @ophaal_label, @ophaal_iso, @subtotaal_cent, @totaal_cent)
+      @ophaal_type, @ophaal_label, @ophaal_iso, @subtotaal_cent, @totaal_cent, @token)
   `);
   const insertItem = db.prepare(`
     INSERT INTO order_items (order_id, product_id, naam, stukprijs_cent, aantal, regel_cent)
@@ -120,16 +123,26 @@ export function maakBestelling(input: OrderInput, nu = new Date()): { id: string
       ophaal_iso: moment ? moment.deadlineIso : null,
       subtotaal_cent: totaalCent,
       totaal_cent: totaalCent,
+      token,
     });
     for (const r of regels) insertItem.run({ order_id: id, ...r });
   })();
 
-  return { id, totaalCent };
+  return { id, totaalCent, token };
 }
 
 export function getOrder(id: string): OrderRow | undefined {
   return db.prepare('SELECT * FROM orders WHERE id = ?').get(id) as OrderRow | undefined;
 }
+/** Bestelling alleen teruggeven als de sleutel uit de link klopt (bedank- en factuurlink). */
+export function getOrderMetToken(id: string, token: string | null | undefined): OrderRow | undefined {
+  const order = getOrder(id);
+  if (!order?.token || !token) return undefined;
+  const a = Buffer.from(order.token);
+  const b = Buffer.from(token);
+  return a.length === b.length && timingSafeEqual(a, b) ? order : undefined;
+}
+
 export function getItems(orderId: string): ItemRow[] {
   return db.prepare('SELECT * FROM order_items WHERE order_id = ?').all(orderId) as ItemRow[];
 }

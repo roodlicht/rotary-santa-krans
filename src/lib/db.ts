@@ -32,7 +32,8 @@ db.exec(`
     subtotaal_cent  INTEGER NOT NULL DEFAULT 0,
     totaal_cent     INTEGER NOT NULL DEFAULT 0,
     mollie_id       TEXT,
-    betaald_op      TEXT
+    betaald_op      TEXT,
+    token           TEXT                      -- onraadbare sleutel voor bedank-/factuurlink
   );
 
   CREATE TABLE IF NOT EXISTS order_items (
@@ -49,3 +50,7 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
   CREATE INDEX IF NOT EXISTS idx_items_order ON order_items(order_id);
 `);
+
+// Migratie: kolommen toevoegen aan een database van vóór deze versie.
+const kolommen = (db.prepare("PRAGMA table_info(orders)").all() as { name: string }[]).map((k) => k.name);
+if (!kolommen.includes('token')) db.exec('ALTER TABLE orders ADD COLUMN token TEXT');

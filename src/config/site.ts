@@ -108,7 +108,9 @@ export const momenten: Record<Klanttype, Moment> = {
 
 /* Betaling (punt 3/10). Alleen iDEAL en Wero, geen creditcard. */
 export const betaling = {
-  methoden: ['ideal'] as string[], // voeg 'wero' toe als dat in je Mollie-account actief is
+  // Leeg = Mollie toont alle methodes die in je Mollie-dashboard aan staan
+  // (nu iDEAL en Wero). Alleen invullen om de keuze extra te beperken.
+  methoden: [] as string[],
   uitleg: 'Je betaalt veilig met iDEAL of Wero via Mollie.',
 };
 
