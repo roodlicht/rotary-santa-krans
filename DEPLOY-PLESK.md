@@ -80,6 +80,24 @@ De Mollie-webhook (`/api/webhook/mollie`) wordt automatisch meegestuurd; er is
 geen aparte configuratie in het Mollie-dashboard nodig, zolang het domein
 publiek op https bereikbaar is.
 
+## E-mail (facturen en contactformulier)
+De mail van het domein draait op deze Plesk-server zelf (MX, SPF en DKIM
+wijzen hierheen). De app geeft mail rechtstreeks aan de lokale mailserver:
+
+| Variabele | Waarde |
+| --- | --- |
+| `SMTP_HOST` | `127.0.0.1` |
+| `SMTP_PORT` | `25` |
+| `SMTP_FROM` | `Rotary Santa Krans <support@rotarykerstkrans.nl>` |
+
+Geen `SMTP_USER`/`SMTP_PASS` nodig. Zorg dat `support@rotarykerstkrans.nl`
+bestaat in Plesk → Mail (mailbox of doorsturen), want daar komen de
+contactberichten en antwoorden op facturen binnen.
+
+Zonder werkende mail krijgt een bezoeker bij het contactformulier een
+foutmelding met het e-mailadres; een factuur kan later opnieuw worden
+verstuurd via /factuur-opvragen.
+
 ## Mollie aanzetten
 De sleutel staat **nooit** in de code (de repo is publiek), alleen in Plesk:
 Node.js → **Custom environment variables** → `MOLLIE_API_KEY` → **Restart App**.

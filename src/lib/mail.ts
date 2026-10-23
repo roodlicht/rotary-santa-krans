@@ -5,11 +5,17 @@ import { maakFactuurPdf } from './invoice';
 import type { OrderRow, ItemRow } from './orders';
 
 const heeftSmtp = !!process.env.SMTP_HOST;
+// Mailserver op dezelfde machine (Plesk): geen TLS, want het certificaat hoort bij
+// mail.<domein> en niet bij localhost, en de mail verlaat de server hier nog niet.
+const lokaal = ['localhost', '127.0.0.1', '::1'].includes(process.env.SMTP_HOST || '');
+// nodemailer zoekt hostnamen via DNS op, en daar staat 'localhost' niet in.
+const smtpHost = process.env.SMTP_HOST === 'localhost' ? '127.0.0.1' : process.env.SMTP_HOST;
 const transporter = heeftSmtp
   ? nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
+      host: smtpHost,
       port: Number(process.env.SMTP_PORT || 587),
       secure: Number(process.env.SMTP_PORT) === 465,
+      ignoreTLS: lokaal,
       auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
     })
   : null;
@@ -55,6 +61,11 @@ export async function stuurFactuur(order: OrderRow, items: ItemRow[]): Promise<v
 export async function stuurContact(naam: string, email: string, bericht: string, ordernr?: string): Promise<void> {
   const tekst = [`Naam: ${naam}`, `E-mail: ${email}`, ordernr ? `Ordernummer: ${ordernr}` : '', '', bericht].join('\n');
   const message = { from: FROM, to: club.contactEmail, replyTo: email, subject: `Contactformulier${ordernr ? ' · ' + ordernr : ''} — ${naam}`, text: tekst };
-  if (!transporter) { console.log(`[mail] (dev, niet verstuurd) contact van ${email}`); return; }
+  if (!transporter) {
+    // In productie mag een bericht niet stil verdwijnen: de bezoeker krijgt dan een foutmelding.
+    if (import.meta.env.PROD) throw new Error('Geen mailserver ingesteld (SMTP_HOST ontbreekt)');
+    console.log(`[mail] (dev, niet verstuurd) contact van ${email}`);
+    return;
+  }
   await transporter.sendMail(message);
 }

@@ -12,7 +12,11 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   if (!naam || !/\S+@\S+\.\S+/.test(email) || !bericht) {
     return new Response('Vul je naam, e-mail en bericht in.', { status: 400 });
   }
-  try { await stuurContact(naam, email, bericht, ordernummer || undefined); }
-  catch (e) { console.error('[contact] mailen mislukt:', e); }
+  try {
+    await stuurContact(naam, email, bericht, ordernummer || undefined);
+  } catch (e) {
+    console.error('[contact] mailen mislukt:', e);
+    return redirect('/contact?fout=1', 303);
+  }
   return redirect('/contact?verzonden=1', 303);
 };

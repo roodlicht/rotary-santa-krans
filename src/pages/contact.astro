@@ -3,6 +3,7 @@ export const prerender = false;
 import Base from '../layouts/Base.astro';
 import { club, momenten } from '../config/site';
 const verzonden = Astro.url.searchParams.get('verzonden') === '1';
+const fout = Astro.url.searchParams.get('fout') === '1';
 ---
 <Base title="Contact" active="contact" description="Vragen over je bestelling bij Rotary Santa Krans? Mail ons of gebruik het contactformulier.">
   <section class="wrap page-hero">
@@ -28,6 +29,7 @@ const verzonden = Astro.url.searchParams.get('verzonden') === '1';
     ) : (
       <form class="panel" method="post" action="/api/contact">
         <h2>Stuur een bericht</h2>
+        {fout && <div class="notice" style="background:#f6e0de;margin-top:14px">Je bericht kon niet worden verstuurd. Mail ons direct via <a href={`mailto:${club.contactEmail}`}>{club.contactEmail}</a>.</div>}
         <div style="display:grid;gap:14px;margin-top:20px">
           <div class="grid2">
             <label class="field">Naam<input name="naam" required /></label>
