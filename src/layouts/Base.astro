@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { club, seo } from '../config/site';
+import { club, seo, factuur } from '../config/site';
 
 interface Props {
   title?: string;
@@ -85,6 +85,9 @@ const links: [string, string, string][] = [
         <div class="foot-bottom">
           <span>{club.organisatie}</span>
           <span>Betalen via iDEAL | Wero (Mollie)</span>
+        </div>
+        <div class="foot-bottom" style="padding-top:8px">
+          <span>{factuur.afzenderNaam} · {factuur.afzenderRegels.join(', ')} · KvK {factuur.kvk}</span>
         </div>
       </div>
     </footer>

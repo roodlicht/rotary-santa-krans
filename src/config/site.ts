@@ -124,10 +124,10 @@ export const meldingen = {
  * Factuurafzender (punt 12). Geen btw (punt 11).
  */
 export const factuur = {
-  afzenderNaam: 'Rotary Santa Krans',
-  afzenderRegels: ['p/a Rietveen 1', '4823 HK Breda'],
-  kvk: '[KvK-nummer]',
-  iban: '[IBAN]',
+  afzenderNaam: 'Stichting Community Service Rotary Club Breda-Zuid',
+  afzenderRegels: ['Nieuw Wolfslaarlaan 31', '4854 EA Bavel'],
+  kvk: '20096019',
+  iban: 'NL94 ABNA 0520 0545 71',
   email: 'support@rotarykerstkrans.nl',
   btwNotitie:
     'Deze actie wordt verzorgd zonder winstoogmerk. Over deze bedragen wordt geen btw in rekening gebracht.',
