@@ -1,7 +1,7 @@
 ---
 export const prerender = true;
 import Base from '../layouts/Base.astro';
-import { club, seo, goedeDoel, producten, momenten } from '../config/site';
+import { club, seo, goedeDoel, organisatie, producten, momenten } from '../config/site';
 import { euroPrefix } from '../lib/money';
 
 const krans = producten.find((p) => p.id === 'krans')!;
@@ -20,7 +20,7 @@ const jsonLd = [
       <div>
         <div class="eyebrow">Rotary Santa Krans {club.jaar}</div>
         <h1>Kerstkransen en kerststollen voor <em>het goede doel</em></h1>
-        <p class="lede">Bestel een roomboter kerstkrans of ambachtelijke kerststol, beide met echte amandelspijs. De opbrengst gaat naar het goede doel.</p>
+        <p class="lede">Bestel een roomboter kerstkrans of ambachtelijke kerststol, beide met echte amandelspijs. De opbrengst gaat naar {goedeDoel.naam}.</p>
         <div class="ctas">
           <a class="btn btn-r" href="/bestellen">Bestel nu →</a>
           <a class="btn btn-o" href="#afhalen">Besteldata &amp; afhalen</a>
@@ -29,6 +29,24 @@ const jsonLd = [
       <div class="hero-media">
         <div class="hero-photo"><img src="/img/krans-close.jpg" alt="Roomboter kerstkrans met amandelspijs" /></div>
         <div class="price-badge"><div><b>€17</b><small>per stuk</small></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="goede-doel" style="padding-top:0">
+    <div class="wrap">
+      <div class="doel">
+        <div>
+          <div class="eyebrow">Het goede doel</div>
+          <h2>{goedeDoel.kop}</h2>
+          {goedeDoel.alineas.map((a) => <p>{a}</p>)}
+          <div><a class="btn btn-g" href={goedeDoel.url} target="_blank" rel="noopener">Meer over het Jeugdfonds ↗</a></div>
+        </div>
+        <div class="doel-cijfer">
+          <b>{goedeDoel.cijfer}</b>
+          <span>{goedeDoel.cijferTekst}</span>
+          <small>Bron: <a href={goedeDoel.url} target="_blank" rel="noopener">{goedeDoel.naam}</a></small>
+        </div>
       </div>
     </div>
   </section>
@@ -107,8 +125,8 @@ const jsonLd = [
       <div class="clubs" style="margin-top:40px">
         <div>
           <div class="eyebrow">Wie organiseert dit?</div>
-          <h2>{goedeDoel.titel}</h2>
-          <p>{goedeDoel.intro}</p>
+          <h2>{organisatie.titel}</h2>
+          <p>{organisatie.intro}</p>
         </div>
         <div class="clublist">{club.clubs.map((c) => <div>{c}</div>)}</div>
       </div>

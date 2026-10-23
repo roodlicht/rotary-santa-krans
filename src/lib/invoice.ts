@@ -1,5 +1,5 @@
 import PDFDocument from 'pdfkit';
-import { factuur, club } from '../config/site';
+import { factuur, club, goedeDoel } from '../config/site';
 import { euroPrefix } from './money';
 import type { OrderRow, ItemRow } from './orders';
 
@@ -102,7 +102,7 @@ export function maakFactuurPdf(order: OrderRow, items: ItemRow[]): Promise<Buffe
 
     doc.font('Helvetica').fontSize(9).fillColor(GRIJS).text(factuur.btwNotitie, L, y, { width: R - L });
     y += 26;
-    doc.fillColor(GROEN).fontSize(10).text(`Hartelijk dank voor uw steun aan het goede doel.`, L, y, { width: R - L });
+    doc.fillColor(GROEN).fontSize(10).text(`Hartelijk dank voor uw steun aan ${goedeDoel.naam}.`, L, y, { width: R - L });
 
     doc.end();
   });

@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { club, factuur } from '../config/site';
+import { club, factuur, goedeDoel } from '../config/site';
 import { euroPrefix } from './money';
 import { maakFactuurPdf } from './invoice';
 import type { OrderRow, ItemRow } from './orders';
@@ -34,7 +34,7 @@ export async function stuurFactuur(order: OrderRow, items: ItemRow[]): Promise<v
       ? [`Afhalen: ${order.ophaal_label}`, `Adres: ${club.adres}`, `Neem je bestelnummer mee.`]
       : ['Je hebt alleen een donatie gedaan — er hoeft niets te worden afgehaald.']),
     '',
-    'De volledige opbrengst gaat naar het goede doel. Hartelijk dank voor je steun!',
+    `De opbrengst gaat naar ${goedeDoel.naam}. Hartelijk dank voor je steun!`,
     '',
     `Met vriendelijke groet,`,
     club.organisatie,

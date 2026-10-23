@@ -8,6 +8,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important} /* laat het hidden-attribuut altijd winnen van .pickup/.grid2/.btn e.d. */
 html,body{margin:0}
+section[id]{scroll-margin-top:110px} /* ankers niet onder de vaste menubalk */
 body{background:var(--bg);color:var(--ink);font-family:'Work Sans',system-ui,sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
 a{color:var(--red);text-decoration:underline;text-underline-offset:3px}
 a:hover{color:var(--redd)}
@@ -160,3 +161,15 @@ table.data th{color:var(--muted);font-weight:600}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 @media (max-width:1000px){.hero-grid,.shop,.moments,.clubs,.split,.foot-grid{grid-template-columns:1fr}.prods,.steps3{grid-template-columns:1fr}.gallery{grid-template-columns:1fr 1fr;height:auto}.gallery div{aspect-ratio:4/3}.gallery div:first-child{grid-column:1/-1}.summary{position:static}.nav-links{order:3;width:100%;margin-left:0}.nav-cta{margin-left:auto}.price-badge{left:10px}.hero-photo{border-radius:28px}}
 @media (max-width:600px){.grid2,.banks,.clublist{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.line{grid-template-columns:64px 1fr}.line img,.line .ph-don{width:64px;height:64px}.line .stepper{grid-column:1/-1;justify-self:start}.moment .row{grid-template-columns:1fr}.panel{padding:22px}}
+/* goede doel */
+.doel{background:var(--green);color:#F4EFE4;border-radius:28px;padding:44px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:40px;align-items:center}
+.doel h2{font-size:clamp(30px,3.6vw,46px);margin:10px 0 16px;color:#F4EFE4;max-width:18ch}
+.doel .eyebrow{color:var(--gold)}
+.doel p{color:rgba(244,239,228,.85);margin-bottom:14px;max-width:56ch}
+.doel .btn{margin-top:8px}
+.doel-cijfer{border-left:1px solid rgba(255,255,255,.18);padding-left:40px;display:flex;flex-direction:column;gap:8px}
+.doel-cijfer b{font-family:'Young Serif';font-weight:400;font-size:clamp(56px,7vw,88px);line-height:1;color:var(--gold)}
+.doel-cijfer span{font-family:'Young Serif';font-size:24px;line-height:1.2;max-width:14ch}
+.doel-cijfer small{font-size:13px;opacity:.7;margin-top:6px}
+.doel-cijfer a{color:#F4EFE4}
+@media (max-width:1000px){.doel{grid-template-columns:1fr;padding:32px}.doel-cijfer{border-left:0;padding-left:0;border-top:1px solid rgba(255,255,255,.18);padding-top:24px}}

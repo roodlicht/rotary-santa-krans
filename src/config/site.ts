@@ -24,15 +24,28 @@ export const club = {
 export const seo = {
   titel: 'Rotary Santa Krans 2026 · Kerstkransen en kerststollen voor het goede doel',
   beschrijving:
-    'Bestel een roomboter kerstkrans of ambachtelijke kerststol van de Rotary clubs van Breda, beide met echte amandelspijs. De opbrengst gaat naar het goede doel. Afhalen in Breda.',
+    'Bestel een roomboter kerstkrans of ambachtelijke kerststol van de Rotary clubs van Breda. De opbrengst gaat naar Jeugdfonds Sport & Cultuur Breda.',
   ogImage: '/img/krans-close.jpg',
 };
 
-/* Het goede doel (punt 2). */
+/* Het goede doel (punt 2). Feiten van jeugdfondssportencultuur.nl/fondsen/breda/ */
 export const goedeDoel = {
+  naam: 'Jeugdfonds Sport & Cultuur Breda',
+  url: 'https://jeugdfondssportencultuur.nl/fondsen/breda/',
+  kop: 'Zodat elk kind in Breda kan sporten en meedoen',
+  alineas: [
+    'Net als vorig jaar gaat de opbrengst van de Rotary Santa Krans naar het Jeugdfonds Sport & Cultuur Breda.',
+    'Voor veel gezinnen is de contributie van een sportclub of het lesgeld voor muziek, dans of theater niet op te brengen. Het Jeugdfonds betaalt die kosten, en soms ook spullen zoals sportkleding of dansschoenen. Het geld gaat rechtstreeks naar de club, dus het komt altijd terecht waar het voor bedoeld is.',
+  ],
+  // Uitgelicht cijfer (letterlijk van de Breda-pagina van het Jeugdfonds).
+  cijfer: '1 op de 9',
+  cijferTekst: 'kinderen in Breda groeit op in armoede',
+};
+
+/* Wie organiseert het (blok onderaan de homepage). */
+export const organisatie = {
   titel: 'De vier Rotary clubs van Breda',
-  intro:
-    'Samen organiseren we de Rotary Santa Krans. De opbrengst gaat naar een goed doel, dat we binnenkort bekendmaken.',
+  intro: 'Samen organiseren we de Rotary Santa Krans. De opbrengst gaat naar het Jeugdfonds Sport & Cultuur Breda.',
 };
 
 /* Producten. 'donatie' telt als product met vaste stukprijs, zonder afhalen. */
@@ -48,7 +61,7 @@ export type Product = {
 export const producten: Product[] = [
   { id: 'krans', naam: 'Roomboter kerstkrans', omschrijving: 'Met echte amandelspijs, rijk versierd.', prijsCent: 1700, afbeelding: 'krans-los.jpg', contain: true },
   { id: 'stol', naam: 'Ambachtelijke kerststol', omschrijving: 'Met echte amandelspijs en royaal gevuld.', prijsCent: 1700, afbeelding: 'stol-gesneden.jpg' },
-  { id: 'donatie', naam: 'Donatie', omschrijving: 'Een gift aan het goede doel, zonder product.', prijsCent: 1250 },
+  { id: 'donatie', naam: 'Donatie', omschrijving: 'Een gift aan het Jeugdfonds, zonder product.', prijsCent: 1250 },
 ];
 
 export const kransId = 'krans';
