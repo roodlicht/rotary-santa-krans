@@ -131,7 +131,7 @@ export const betaling = {
 export const contactOnderwerpen = [
   { id: 'afhalen', label: 'Afhalen' },
   { id: 'factuur', label: 'Factuur' },
-  { id: 'wijzigen', label: 'Bestelling wijzigen of annuleren' },
+  { id: 'wijzigen', label: 'Bestelling wijzigen' },
   { id: 'betaling', label: 'Betaling' },
   { id: 'zakelijk', label: 'Zakelijke bestelling' },
   { id: 'allergenen', label: 'Allergenen' },
@@ -151,9 +151,9 @@ export const afspraken = {
   // Wat er gebeurt als een bestelling niet wordt opgehaald.
   nietOpgehaald:
     'Wordt een bestelling niet op het afhaalmoment opgehaald, dan schenken wij de producten aan een lokaal goed doel. Het betaalde bedrag wordt niet terugbetaald; het blijft bestemd voor het goede doel van deze actie.',
-  // Annuleren.
+  // Annuleren: niet mogelijk, want terugbetalen kost transactiekosten bij Mollie.
   annuleren:
-    'Je kunt een bestelling kosteloos annuleren tot de besteldeadline van je afhaalmoment. Stuur daarvoor een bericht via het contactformulier met het onderwerp "Bestelling wijzigen of annuleren" en je bestelnummer; je krijgt het bedrag dan teruggestort. Na de besteldeadline is annuleren niet meer mogelijk, omdat de producten dan worden gebakken.',
+    'Een betaalde bestelling kan niet worden geannuleerd of terugbetaald. Kun je zelf niet op het afhaalmoment komen, dan mag iemand anders je bestelling ophalen met je bestelnummer. Wil je meer bestellen, plaats dan een extra bestelling. Klopt er iets niet aan je gegevens, laat het ons weten via het contactformulier met het onderwerp "Bestelling wijzigen" en je bestelnummer.',
   versie: 'oktober 2026',
 };
 
