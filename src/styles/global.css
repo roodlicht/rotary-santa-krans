@@ -65,6 +65,7 @@ p{margin:0;text-wrap:pretty}
 .moment.biz{background:var(--ink);color:var(--bg)}
 .moment.priv{background:var(--red);color:#fff}
 .moment h3{font-size:32px}
+.moment-cta{margin-top:auto} /* knoppen onderaan, ook als de kaarten een ander aantal regels hebben */
 .moment .rows{display:grid;gap:0}
 .moment .row{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:12px 0;border-top:1px solid rgba(255,255,255,.2)}
 .moment .row span:first-child{opacity:.78;font-size:15px}
