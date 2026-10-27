@@ -11,6 +11,8 @@ export default defineConfig({
   // Eigen, proxy-bewuste CSRF-check in src/middleware.ts (de ingebouwde check
   // gebruikt url.origin, wat achter Passenger/Plesk onbetrouwbaar is).
   security: { checkOrigin: false },
+  // Sommige tools zoeken de sitemap op /sitemap.xml; Astro maakt een index.
+  redirects: { '/sitemap.xml': { status: 301, destination: '/sitemap-index.xml' } },
   integrations: [
     sitemap({
       filter: (page) => !page.includes('/beheer') && !page.includes('/api/') && !page.includes('/bedankt'),
