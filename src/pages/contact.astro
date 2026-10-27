@@ -16,8 +16,8 @@ const fout = Astro.url.searchParams.get('fout') === '1';
       <h3>E-mail</h3>
       <a href={`mailto:${club.contactEmail}`} style="font-family:'Young Serif';font-size:26px">{club.contactEmail}</a>
       <div class="row"><span>Afhaaladres</span><span>{club.adres}</span></div>
-      <div class="row"><span>Bedrijven</span><span>di 8 dec, 17:00 – 21:00</span></div>
-      <div class="row"><span>Particulieren</span><span>zo 20 dec, 17:00 – 21:00</span></div>
+      <div class="row"><span>Bedrijven</span><span>{momenten.zakelijk.ophaalKort}, {momenten.zakelijk.ophaalTijd}</span></div>
+      <div class="row"><span>Particulieren</span><span>{momenten.particulier.ophaalKort}, {momenten.particulier.ophaalTijd}</span></div>
       <div style="margin-top:8px"><a class="btn btn-o" href={club.maps} target="_blank" rel="noopener">Route plannen ↗</a></div>
     </div>
     {verzonden ? (

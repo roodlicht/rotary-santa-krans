@@ -33,7 +33,7 @@ In testmodus (geen MOLLIE_API_KEY) wordt de betaling gesimuleerd. Beheer: /behee
 5. `data/` schrijfbaar houden.
 
 ## Belangrijke keuzes uit het prototype
-- Twee producten à €17, donatie €12,50 per stuk.
+- Twee producten en een donatie per stuk; prijzen, besteldeadlines en afhaalmomenten staan alleen in `src/config/site.ts`.
 - Ophaalmoment volgt uit particulier/zakelijk; elk met eigen besteldeadline.
 - Zakelijk: bedrijfsnaam + contactpersoon + factuuradres verplicht (geen KvK), factuur op bedrijfsnaam.
 - Na de deadline zijn producten geweigerd, doneren kan nog.

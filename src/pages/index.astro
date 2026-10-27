@@ -2,12 +2,16 @@
 export const prerender = true;
 import Base from '../layouts/Base.astro';
 import { club, seo, goedeDoel, organisatie, producten, momenten } from '../config/site';
-import { euroPrefix } from '../lib/money';
+import { euroPrefix, euroKort } from '../lib/money';
 
 const krans = producten.find((p) => p.id === 'krans')!;
 const stol = producten.find((p) => p.id === 'stol')!;
 const donatie = producten.find((p) => p.id === 'donatie')!;
 const prodCards = [krans, stol];
+const laagstePrijs = Math.min(krans.prijsCent, stol.prijsCent);
+const prijsGelijk = krans.prijsCent === stol.prijsCent;
+// Eén tijdvak voor beide afhaalmomenten? Dan noemen we het in stap 3.
+const tijden = [...new Set([momenten.zakelijk.ophaalTijd, momenten.particulier.ophaalTijd])];
 
 const jsonLd = [
   { '@context': 'https://schema.org', '@type': 'Organization', name: club.naam, email: club.contactEmail, description: seo.beschrijving, address: { '@type': 'PostalAddress', streetAddress: 'Rietveen 1', postalCode: '4823 HK', addressLocality: 'Breda', addressCountry: 'NL' } },
@@ -28,7 +32,7 @@ const jsonLd = [
       </div>
       <div class="hero-media">
         <div class="hero-photo"><img src="/img/krans-close.jpg" alt="Roomboter kerstkrans met amandelspijs" /></div>
-        <div class="price-badge"><div><b>€17</b><small>per stuk</small></div></div>
+        <div class="price-badge"><div><b>{euroKort(laagstePrijs)}</b><small>{prijsGelijk ? 'per stuk' : 'vanaf'}</small></div></div>
       </div>
     </div>
   </section>
@@ -110,7 +114,7 @@ const jsonLd = [
       <div class="steps3">
         <div class="s3"><div class="n">1</div><h3>Bestel online</h3><p>Kies kransen, stollen en/of donaties. Bestel je voor je bedrijf? Vink dan "zakelijk" aan.</p></div>
         <div class="s3"><div class="n">2</div><h3>Betaal met iDEAL | Wero</h3><p>Veilig afrekenen via Mollie. Je krijgt direct een bevestiging per e-mail.</p></div>
-        <div class="s3"><div class="n">3</div><h3>Haal je bestelling af</h3><p>Op je afhaalmoment tussen 17:00 en 21:00 uur aan het {club.adres}, met je bevestiging bij de hand.</p></div>
+        <div class="s3"><div class="n">3</div><h3>Haal je bestelling af</h3><p>Op je afhaalmoment{tijden.length === 1 ? ` (${tijden[0]})` : ''} aan het {club.adres}, met je bevestiging bij de hand.</p></div>
       </div>
     </div>
   </section>

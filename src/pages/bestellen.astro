@@ -2,7 +2,7 @@
 export const prerender = false;
 import Base from '../layouts/Base.astro';
 import { producten, momenten, betaling, club } from '../config/site';
-import { euroPrefix } from '../lib/money';
+import { euroPrefix, euroKort } from '../lib/money';
 
 const krans = producten.find((p) => p.id === 'krans')!;
 const stol = producten.find((p) => p.id === 'stol')!;
@@ -23,7 +23,7 @@ const clientData = {
   <section class="wrap page-hero">
     <div class="eyebrow">Bestellen</div>
     <h1>Bestel je kerstkrans of kerststol</h1>
-    <p>€17 per stuk, donatie €12,50. Particulieren bestellen tot {momenten.particulier.deadlineTxt}; bedrijven tot {momenten.zakelijk.deadlineTxt}.</p>
+    <p>{krans.prijsCent === stol.prijsCent ? `${euroKort(krans.prijsCent)} per stuk` : `Kerstkrans ${euroKort(krans.prijsCent)}, kerststol ${euroKort(stol.prijsCent)}`}, donatie {euroKort(donatie.prijsCent)}. Particulieren bestellen tot {momenten.particulier.deadlineTxt}; bedrijven tot {momenten.zakelijk.deadlineTxt}.</p>
   </section>
 
   <section class="wrap shop">

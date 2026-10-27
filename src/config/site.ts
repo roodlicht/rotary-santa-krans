@@ -59,8 +59,8 @@ export type Product = {
 };
 
 export const producten: Product[] = [
-  { id: 'krans', naam: 'Roomboter kerstkrans', omschrijving: 'Met echte amandelspijs, rijk versierd.', prijsCent: 1700, afbeelding: 'krans-los.jpg', contain: true },
-  { id: 'stol', naam: 'Ambachtelijke kerststol', omschrijving: 'Met echte amandelspijs en royaal gevuld.', prijsCent: 1700, afbeelding: 'stol-gesneden.jpg' },
+  { id: 'krans', naam: 'Roomboter kerstkrans', omschrijving: 'Met echte amandelspijs, rijk versierd.', prijsCent: 1500, afbeelding: 'krans-los.jpg', contain: true },
+  { id: 'stol', naam: 'Ambachtelijke kerststol', omschrijving: 'Met echte amandelspijs en royaal gevuld.', prijsCent: 1500, afbeelding: 'stol-gesneden.jpg' },
   { id: 'donatie', naam: 'Donatie', omschrijving: 'Een gift aan het Jeugdfonds, zonder product.', prijsCent: 1250 },
 ];
 
@@ -78,29 +78,37 @@ export type Klanttype = 'particulier' | 'zakelijk';
 export type Moment = {
   type: Klanttype;
   label: string;
-  deadlineIso: string;
-  deadlineTxt: string;
-  ophalenTxt: string;
-  ophaalDag: string; // dagnummer, voor de datumbadge
+  deadlineIso: string;   // laatste besteltijdstip (daarna alleen nog doneren)
+  deadlineTxt: string;   // zo getoond op de site
+  ophalenTxt: string;    // volledige afhaaltekst, ook op factuur en in mails
+  ophaalKort: string;    // korte dag + datum, voor footer en contactpagina
+  ophaalTijd: string;    // tijdvak
+  ophaalDag: string;     // dagnummer, voor de datumbadge
   ophaalMaand: string;
 };
 
 export const momenten: Record<Klanttype, Moment> = {
+  // Bestelmoment 2
   particulier: {
     type: 'particulier',
     label: 'Particulieren',
-    deadlineIso: '2026-12-18T10:00:00+01:00',
-    deadlineTxt: 'vrijdag 18 december, 10:00 uur',
-    ophalenTxt: 'zondag 20 december, 17:00 – 21:00 uur',
-    ophaalDag: '20',
+    deadlineIso: '2026-12-17T10:00:00+01:00',
+    deadlineTxt: 'donderdag 17 december, 10:00 uur',
+    ophalenTxt: 'dinsdag 22 december, 18:00 – 21:00 uur',
+    ophaalKort: 'di 22 december',
+    ophaalTijd: '18:00 – 21:00 uur',
+    ophaalDag: '22',
     ophaalMaand: 'dec',
   },
+  // Bestelmoment 1
   zakelijk: {
     type: 'zakelijk',
     label: 'Bedrijven',
-    deadlineIso: '2026-12-04T10:00:00+01:00',
-    deadlineTxt: 'vrijdag 4 december, 10:00 uur',
-    ophalenTxt: 'dinsdag 8 december, 17:00 – 21:00 uur',
+    deadlineIso: '2026-12-03T10:00:00+01:00',
+    deadlineTxt: 'donderdag 3 december, 10:00 uur',
+    ophalenTxt: 'dinsdag 8 december, 18:00 – 21:00 uur',
+    ophaalKort: 'di 8 december',
+    ophaalTijd: '18:00 – 21:00 uur',
     ophaalDag: '8',
     ophaalMaand: 'dec',
   },

@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { club, seo, factuur } from '../config/site';
+import { club, seo, factuur, momenten } from '../config/site';
 
 interface Props {
   title?: string;
@@ -67,9 +67,18 @@ const links: [string, string, string][] = [
             <h4>Afhalen</h4>
             <ul>
               <li>{club.adres}</li>
-              <li>Bedrijven: di 8 december</li>
-              <li>Particulieren: zo 20 december</li>
-              <li>17:00 – 21:00 uur</li>
+              {momenten.zakelijk.ophaalTijd === momenten.particulier.ophaalTijd ? (
+                <>
+                  <li>Bedrijven: {momenten.zakelijk.ophaalKort}</li>
+                  <li>Particulieren: {momenten.particulier.ophaalKort}</li>
+                  <li>{momenten.zakelijk.ophaalTijd}</li>
+                </>
+              ) : (
+                <>
+                  <li>Bedrijven: {momenten.zakelijk.ophaalKort}, {momenten.zakelijk.ophaalTijd}</li>
+                  <li>Particulieren: {momenten.particulier.ophaalKort}, {momenten.particulier.ophaalTijd}</li>
+                </>
+              )}
             </ul>
           </div>
           <div>
