@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { club, seo, factuur, momenten } from '../config/site';
+import { club, seo, factuur, momenten, statistiek } from '../config/site';
 
 interface Props {
   title?: string;
@@ -12,6 +12,8 @@ interface Props {
 const { title, description, active, jsonLd, noindex = false } = Astro.props;
 const paginaTitel = title ? `${title} · ${club.naam}` : seo.titel;
 const paginaOmschrijving = description || seo.beschrijving;
+// Umami niet op het beheer (eigen bezoeken vertekenen de cijfers) en niet lokaal.
+const metStatistiek = import.meta.env.PROD && !!statistiek.umamiWebsiteId && !Astro.url.pathname.startsWith('/beheer');
 const canonical = new URL(Astro.url.pathname, Astro.site || Astro.url.origin).href;
 const ogImage = new URL(seo.ogImage, Astro.site || Astro.url.origin).href;
 const links: [string, string, string][] = [
@@ -37,6 +39,26 @@ const links: [string, string, string][] = [
     <meta property="og:locale" content="nl_NL" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {metStatistiek && (
+      <>
+        {/* Bestelnummers uit /bedankt/SK-… weglaten: alle bedankpagina's tellen als één pagina. */}
+        <script is:inline>
+          window.umamiVoorVerzenden = function (type, payload) {
+            if (payload && payload.url) payload.url = payload.url.replace(/^\/bedankt\/[^/?#]+/, '/bedankt');
+            return payload;
+          };
+        </script>
+        <script
+          is:inline
+          defer
+          src={statistiek.umamiScript}
+          data-website-id={statistiek.umamiWebsiteId}
+          data-domains={statistiek.domeinen}
+          data-exclude-search="true"
+          data-before-send="umamiVoorVerzenden"
+        ></script>
+      </>
+    )}
     <link rel="preload" as="font" type="font/woff2" href="/fonts/youngserif-latin.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/worksans-latin.woff2" crossorigin />
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}

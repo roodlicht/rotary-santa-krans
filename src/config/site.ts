@@ -137,6 +137,16 @@ export const contactOnderwerpen = [
   { id: 'overig', label: 'Overig' },
 ];
 
+/*
+ * Bezoekersstatistieken via Umami Cloud (geen cookies, dus geen cookiebanner).
+ * Leeg websiteId = uit. Alleen actief op de domeinen hieronder.
+ */
+export const statistiek = {
+  umamiScript: 'https://cloud.umami.is/script.js',
+  umamiWebsiteId: '195bf406-f5c5-4c44-90c4-feb89b69a0ed',
+  domeinen: 'rotarykerstkrans.nl,www.rotarykerstkrans.nl',
+};
+
 /* Meldingen aan de organisatie. */
 export const meldingen = {
   // Bij elke betaalde bestelling een mail naar het contactadres (support@).

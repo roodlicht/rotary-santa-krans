@@ -18,7 +18,7 @@ const clientData = {
   startZakelijk,
 };
 ---
-<Base title="Bestellen" active="bestellen" noindex={true}>
+<Base title="Bestellen" active="bestellen" description="Bestel een roomboter kerstkrans of ambachtelijke kerststol, of doneer aan het Jeugdfonds Sport & Cultuur Breda. Betalen met iDEAL of Wero.">
   <section class="wrap page-hero">
     <div class="eyebrow">Bestellen</div>
     <h1>Bestel je kerstkrans of kerststol</h1>
@@ -104,7 +104,7 @@ const clientData = {
         <button type="button" class="btn btn-o" id="back" hidden>← Terug</button>
         <span id="hint" class="hint" hidden></span>
         <button type="button" class="btn btn-r" id="next">Verder →</button>
-        <button type="submit" class="btn btn-r" id="pay" hidden>Betaal <span id="pay-btn-total">€ 0,00</span></button>
+        <button type="submit" class="btn btn-r" id="pay" data-umami-event="Betalen gestart" hidden>Betaal <span id="pay-btn-total">€ 0,00</span></button>
       </div>
     </form>
 
