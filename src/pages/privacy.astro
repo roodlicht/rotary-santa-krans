@@ -1,0 +1,55 @@
+---
+export const prerender = true;
+import Base from '../layouts/Base.astro';
+import { factuur, afspraken } from '../config/site';
+---
+<Base title="Privacyverklaring" description="Hoe de Rotary Santa Krans omgaat met je persoonsgegevens bij bestellingen, donaties en het contactformulier.">
+  <section class="wrap page-hero">
+    <div class="eyebrow">Privacy</div>
+    <h1>Privacyverklaring</h1>
+    <p>Hoe we omgaan met je gegevens als je bestelt, doneert of contact met ons opneemt. Versie {afspraken.versie}.</p>
+  </section>
+
+  <section class="wrap tekst">
+    <h2>Wie is verantwoordelijk</h2>
+    <p><b>{factuur.afzenderNaam}</b>, {factuur.afzenderRegels.join(', ')}, KvK {factuur.kvk}, is verantwoordelijk voor de verwerking van je persoonsgegevens via deze website.</p>
+
+    <h2>Welke gegevens we gebruiken</h2>
+    <ul>
+      <li><b>Bij een bestelling of donatie:</b> naam, e-mailadres, telefoonnummer, eventuele opmerking, wat je bestelt en je afhaalmoment. Bestel je zakelijk, dan ook de bedrijfsnaam en het factuuradres.</li>
+      <li><b>Bij het betalen:</b> we ontvangen alleen of de betaling is gelukt. Je bankgegevens gaan rechtstreeks naar onze betaalprovider Mollie; die zien wij niet.</li>
+      <li><b>Bij het contactformulier:</b> naam, e-mailadres, onderwerp, eventueel bestelnummer en je bericht.</li>
+    </ul>
+
+    <h2>Waarvoor</h2>
+    <ul>
+      <li>Je bestelling afhandelen: bevestiging en factuur sturen, en je bestelling klaarzetten voor het afhalen.</li>
+      <li>Contact met je opnemen over je bestelling, bijvoorbeeld over het afhaalmoment.</li>
+      <li>Je vraag via het contactformulier beantwoorden.</li>
+      <li>Onze administratie, zoals de wet voorschrijft.</li>
+    </ul>
+    <p>We gebruiken je gegevens niet voor andere doelen, sturen je geen nieuwsbrieven en verkopen niets aan anderen.</p>
+
+    <h2>Hoe lang we gegevens bewaren</h2>
+    <p>Gegevens die bij een bestelling en factuur horen, bewaren we 7 jaar; dat is de wettelijke bewaarplicht voor de administratie. Berichten via het contactformulier bewaren we tot je vraag is afgehandeld, en uiterlijk een jaar na afloop van de actie.</p>
+
+    <h2>Wie je gegevens nog meer verwerkt</h2>
+    <p>We werken met een paar dienstverleners die je gegevens alleen voor ons verwerken:</p>
+    <ul>
+      <li><b>Mollie</b>: de afhandeling van je betaling.</li>
+      <li><b>TransIP</b>: de server waarop deze website en de bestellingen staan, in Nederland.</li>
+      <li><b>Cloudflare</b>: de beveiliging en snelle doorgifte van het websiteverkeer.</li>
+      <li><b>Google</b>: e-mail aan de organisatie (contactberichten en bestelmeldingen) komt binnen in een mailbox bij Google.</li>
+    </ul>
+    <p>Sommige van deze partijen kunnen gegevens ook buiten de Europese Unie verwerken. Dat gebeurt dan op basis van de waarborgen die de Europese privacywet daarvoor stelt.</p>
+
+    <h2>Cookies en statistieken</h2>
+    <p>Wij plaatsen geen cookies om je te volgen of voor advertenties. Alleen onze beveiligingsdienst Cloudflare kan in bijzondere gevallen een technisch noodzakelijke cookie plaatsen. Voor bezoekersstatistieken gebruiken we Umami, dat zonder cookies werkt en geen persoonsgegevens opslaat: we zien bijvoorbeeld hoeveel mensen een pagina bezoeken, niet wie. Op de betaalpagina van Mollie gelden de privacyregels van Mollie.</p>
+
+    <h2>Beveiliging</h2>
+    <p>De website werkt alleen via een beveiligde verbinding (https). De gegevens van bestellingen zijn alleen toegankelijk voor de organisatie, met een wachtwoord.</p>
+
+    <h2>Je rechten</h2>
+    <p>Je mag je gegevens inzien, laten corrigeren of laten verwijderen, voor zover we ze niet wettelijk moeten bewaren. Je kunt ook bezwaar maken tegen het gebruik ervan. Stuur daarvoor een bericht via het <a href="/contact?onderwerp=privacy">contactformulier</a> met het onderwerp "Privacy". Ben je het niet eens met hoe we met je gegevens omgaan, dan kun je een klacht indienen bij de <a href="https://autoriteitpersoonsgegevens.nl" target="_blank" rel="noopener">Autoriteit Persoonsgegevens</a>.</p>
+  </section>
+</Base>

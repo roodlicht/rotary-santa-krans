@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 import Base from '../layouts/Base.astro';
-import { producten, momenten, betaling, club } from '../config/site';
+import { producten, momenten, betaling, club, allergenen } from '../config/site';
 import { euroPrefix, euroKort } from '../lib/money';
 
 const krans = producten.find((p) => p.id === 'krans')!;
@@ -62,6 +62,7 @@ const clientData = {
           </div>
         ))}
 
+        <p class="allergeen" style="margin-top:14px">{allergenen.tekst} <a href={allergenen.vraagLink} target="_blank" rel="noopener">{allergenen.vraagTekst}</a>.</p>
         <div class="pickup" id="pickup-card" hidden>
           <div class="d"><b id="pk-day">20</b><small id="pk-mon">dec</small></div>
           <div><b id="pk-txt">Afhalen</b><p id="pk-adres"></p></div>
@@ -88,7 +89,8 @@ const clientData = {
           </div>
           <label class="field">Opmerking (optioneel)<textarea id="note" name="opmerking" rows="3"></textarea></label>
         </div>
-        <label class="check"><input type="checkbox" id="agree" /><span id="agree-txt">Ik ga akkoord met de voorwaarden.</span></label>
+        <label class="check"><input type="checkbox" id="agree" /><span>Ik ga akkoord met de <a href="/voorwaarden" target="_blank" rel="noopener">voorwaarden</a><span id="agree-extra"></span>.</span></label>
+        <p class="allergeen" style="margin-top:10px">We gebruiken je gegevens alleen voor je bestelling. Lees onze <a href="/privacy" target="_blank" rel="noopener">privacyverklaring</a>.</p>
       </div>
 
       <!-- STAP 2: Betalen -->
@@ -183,7 +185,7 @@ const clientData = {
         $('biz-fields').hidden = !biz;
         $('name-label').textContent = biz ? 'Contactpersoon' : 'Naam';
         $('gegevens-intro').innerHTML = (biz ? 'Je bestelt zakelijk. De factuur komt op naam van het bedrijf.' : 'Hiermee sturen we je de bevestiging.');
-        $('agree-txt').textContent = 'Ik ga akkoord met de voorwaarden' + (products() > 0 ? ' en haal de bestelling af op het afhaalmoment' : '') + '.';
+        $('agree-extra').textContent = products() > 0 ? ' en haal de bestelling af op het afhaalmoment' : '';
       }
 
       function show() {

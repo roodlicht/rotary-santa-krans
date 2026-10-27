@@ -1,0 +1,57 @@
+---
+export const prerender = true;
+import Base from '../layouts/Base.astro';
+import { factuur, producten, momenten, goedeDoel, allergenen, afspraken } from '../config/site';
+import { euroPrefix } from '../lib/money';
+
+const verkoopbaar = producten.filter((p) => p.id !== 'donatie');
+const donatie = producten.find((p) => p.id === 'donatie')!;
+const ms = [momenten.zakelijk, momenten.particulier];
+---
+<Base title="Voorwaarden" description="Voorwaarden voor bestellingen en donaties bij de Rotary Santa Krans: prijzen, betalen, afhalen, annuleren en allergenen.">
+  <section class="wrap page-hero">
+    <div class="eyebrow">Voorwaarden</div>
+    <h1>Voorwaarden</h1>
+    <p>Deze voorwaarden gelden voor bestellingen en donaties via deze website. Versie {afspraken.versie}.</p>
+  </section>
+
+  <section class="wrap tekst">
+    <h2>Wie zijn wij</h2>
+    <p>De Rotary Santa Krans is een actie van de vier Rotary clubs van Breda. Verkoper is <b>{factuur.afzenderNaam}</b>, {factuur.afzenderRegels.join(', ')}, KvK {factuur.kvk}. De opbrengst gaat naar {goedeDoel.naam}. Vragen stel je via het <a href="/contact">contactformulier</a>.</p>
+
+    <h2>Producten en prijzen</h2>
+    <ul>
+      {verkoopbaar.map((p) => <li>{p.naam}: {euroPrefix(p.prijsCent)} per stuk</li>)}
+      <li>Donatie (zonder product): {euroPrefix(donatie.prijsCent)} per donatie</li>
+    </ul>
+    <p>De actie wordt verzorgd zonder winstoogmerk. Over de bedragen wordt geen btw in rekening gebracht.</p>
+
+    <h2>Allergenen</h2>
+    <p>{allergenen.tekst} Vraag de specificaties aan via het <a href={allergenen.vraagLink}>contactformulier</a> (onderwerp "Allergenen"), bij voorkeur vóór je bestelt.</p>
+
+    <h2>Bestellen en betalen</h2>
+    <p>Je betaalt direct bij het bestellen met iDEAL of Wero, via onze betaalprovider Mollie. Je bestelling is definitief zodra de betaling is gelukt. Je ontvangt dan per e-mail een bevestiging met de factuur en je bestelnummer. Bewaar dat bestelnummer: je hebt het nodig bij het afhalen en als je de factuur opnieuw wilt <a href="/factuur-opvragen">opvragen</a>.</p>
+
+    <h2>Besteltermijn en afhalen</h2>
+    <p>Er is geen bezorging. Je haalt je bestelling af op het afhaalmoment dat bij je bestelling hoort:</p>
+    <ul>
+      {ms.map((m) => <li><b>{m.label}:</b> bestellen tot {m.deadlineTxt}; afhalen op {m.ophalenTxt} op {m.adres}.</li>)}
+    </ul>
+    <p>Na de besteldeadline kun je niet meer bestellen; doneren kan wel. Neem bij het afhalen je bestelnummer mee.</p>
+
+    <h2>Niet opgehaald</h2>
+    <p>{afspraken.nietOpgehaald}</p>
+
+    <h2>Annuleren</h2>
+    <p>{afspraken.annuleren}</p>
+
+    <h2>Geen bedenktijd</h2>
+    <p>Bij aankopen op afstand geldt normaal een bedenktijd van 14 dagen. Die geldt niet voor producten die snel bederven of een beperkte houdbaarheid hebben, zoals onze kerstkransen en kerststollen. Annuleren kan wel zoals hierboven beschreven.</p>
+
+    <h2>Donaties</h2>
+    <p>Donaties komen volledig ten goede aan {goedeDoel.naam} en worden niet terugbetaald.</p>
+
+    <h2>Vragen en klachten</h2>
+    <p>Heb je een vraag of klacht over je bestelling? Laat het ons weten via het <a href="/contact">contactformulier</a>. We reageren zo snel mogelijk.</p>
+  </section>
+</Base>

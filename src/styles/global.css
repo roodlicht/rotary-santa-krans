@@ -174,3 +174,10 @@ table.data th{color:var(--muted);font-weight:600}
 .doel-cijfer small{font-size:13px;opacity:.7;margin-top:6px}
 .doel-cijfer a{color:#F4EFE4}
 @media (max-width:1000px){.doel{grid-template-columns:1fr;padding:32px}.doel-cijfer{border-left:0;padding-left:0;border-top:1px solid rgba(255,255,255,.18);padding-top:24px}}
+/* tekstpagina's (voorwaarden, privacy) */
+.tekst{padding-bottom:80px}
+.tekst > *{max-width:760px} /* leesbare regellengte, links uitgelijnd met de kop */
+.tekst h2{font-size:28px;margin:34px 0 10px}
+.tekst p,.tekst li{margin-bottom:10px}
+.tekst ul{padding-left:22px;margin:0 0 10px}
+.allergeen{font-size:14px;color:var(--muted);margin-top:16px}

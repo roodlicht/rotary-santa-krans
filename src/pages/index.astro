@@ -1,7 +1,7 @@
 ---
 export const prerender = true;
 import Base from '../layouts/Base.astro';
-import { club, seo, goedeDoel, organisatie, producten, momenten, zelfdeAdres, routeUrl } from '../config/site';
+import { club, seo, goedeDoel, organisatie, producten, momenten, zelfdeAdres, routeUrl, allergenen } from '../config/site';
 import { euroPrefix, euroKort } from '../lib/money';
 
 const krans = producten.find((p) => p.id === 'krans')!;
@@ -81,6 +81,7 @@ const jsonLd = [
           </div>
         </div>
       </div>
+      <p class="allergeen">{allergenen.tekst} <a href={allergenen.vraagLink}>{allergenen.vraagTekst}</a>.</p>
     </div>
   </section>
 

@@ -134,8 +134,28 @@ export const contactOnderwerpen = [
   { id: 'wijzigen', label: 'Bestelling wijzigen of annuleren' },
   { id: 'betaling', label: 'Betaling' },
   { id: 'zakelijk', label: 'Zakelijke bestelling' },
+  { id: 'allergenen', label: 'Allergenen' },
+  { id: 'privacy', label: 'Privacy' },
   { id: 'overig', label: 'Overig' },
 ];
+
+/* Allergenen: korte vermelding bij de producten; specificaties op aanvraag. */
+export const allergenen = {
+  tekst: 'Onze producten kunnen allergenen bevatten.',
+  vraagTekst: 'Vraag de specificaties aan via het contactformulier',
+  vraagLink: '/contact?onderwerp=allergenen',
+};
+
+/* Afspraken die in de voorwaarden staan. */
+export const afspraken = {
+  // Wat er gebeurt als een bestelling niet wordt opgehaald.
+  nietOpgehaald:
+    'Wordt een bestelling niet op het afhaalmoment opgehaald, dan schenken wij de producten aan een lokaal goed doel. Het betaalde bedrag wordt niet terugbetaald; het blijft bestemd voor het goede doel van deze actie.',
+  // Annuleren.
+  annuleren:
+    'Je kunt een bestelling kosteloos annuleren tot de besteldeadline van je afhaalmoment. Stuur daarvoor een bericht via het contactformulier met het onderwerp "Bestelling wijzigen of annuleren" en je bestelnummer; je krijgt het bedrag dan teruggestort. Na de besteldeadline is annuleren niet meer mogelijk, omdat de producten dan worden gebakken.',
+  versie: 'oktober 2026',
+};
 
 /*
  * Bezoekersstatistieken via Umami Cloud (geen cookies, dus geen cookiebanner).
