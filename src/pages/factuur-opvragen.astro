@@ -21,6 +21,6 @@ const fout = Astro.url.searchParams.get('fout') === '1';
       </div>
       <div class="panel-nav"><span></span><button class="btn btn-r" type="submit">Factuur opnieuw versturen</button></div>
     </form>
-    <p style="margin-top:20px;color:var(--muted);font-size:15px">Lukt het niet? Mail ons via <a href={`mailto:${club.contactEmail}`}>{club.contactEmail}</a>.</p>
+    <p style="margin-top:20px;color:var(--muted);font-size:15px">Lukt het niet? Stuur ons een bericht via het <a href="/contact?onderwerp=factuur">contactformulier</a>.</p>
   </section>
 </Base>

@@ -96,9 +96,9 @@ export async function stuurBestelmelding(order: OrderRow, items: ItemRow[]): Pro
 }
 
 /** Contactformulier-bericht naar de organisatie (reply-to = afzender). */
-export async function stuurContact(naam: string, email: string, bericht: string, ordernr?: string): Promise<void> {
-  const tekst = [`Naam: ${naam}`, `E-mail: ${email}`, ordernr ? `Ordernummer: ${ordernr}` : '', '', bericht].join('\n');
-  const message = { from: FROM, to: club.contactEmail, replyTo: email, subject: `Contactformulier${ordernr ? ' · ' + ordernr : ''} — ${naam}`, text: tekst };
+export async function stuurContact(onderwerp: string, naam: string, email: string, bericht: string, ordernr?: string): Promise<void> {
+  const tekst = [`Onderwerp: ${onderwerp}`, `Naam: ${naam}`, `E-mail: ${email}`, ordernr ? `Ordernummer: ${ordernr}` : '', '', bericht].join('\n');
+  const message = { from: FROM, to: club.contactEmail, replyTo: email, subject: `[${onderwerp}] Contactformulier${ordernr ? ' · ' + ordernr : ''} — ${naam}`, text: tekst };
   if (!transporter) {
     // In productie mag een bericht niet stil verdwijnen: de bezoeker krijgt dan een foutmelding.
     if (import.meta.env.PROD) throw new Error('Geen mailserver ingesteld (SMTP_HOST ontbreekt)');

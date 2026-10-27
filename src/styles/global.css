@@ -121,8 +121,8 @@ p{margin:0;text-wrap:pretty}
 .toggle input{width:22px;height:22px;accent-color:var(--red)}
 .toggle b{display:block}.toggle small{color:var(--muted);font-size:14px}
 .field{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
-.field input,.field textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;min-height:46px}
-.field input:focus,.field textarea:focus{outline:2px solid var(--red);outline-offset:1px}
+.field input,.field textarea,.field select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;min-height:46px}
+.field input:focus,.field textarea:focus,.field select:focus{outline:2px solid var(--red);outline-offset:1px}
 .field.err input{border-color:var(--red);background:#FCEDEA}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .pickup{display:flex;gap:16px;align-items:flex-start;padding:18px 20px;border-radius:18px;background:var(--cream2);margin-top:20px}

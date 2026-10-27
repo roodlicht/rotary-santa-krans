@@ -47,17 +47,21 @@ export function maakFactuurPdf(order: OrderRow, items: ItemRow[]): Promise<Buffe
     doc.font('Helvetica').fontSize(9).fillColor(GRIJS);
     doc.text([factuur.afzenderNaam, ...factuur.afzenderRegels, `KvK: ${factuur.kvk}`, `IBAN: ${factuur.iban}`, factuur.email].join('\n'), L, 56, { width: R - L, align: 'right' });
 
-    doc.moveTo(L, 116).lineTo(R, 116).lineWidth(1).strokeColor('#e3ded0').stroke();
+    // Lijn één regel onder het afzenderblok (dat groeit mee met het aantal regels);
+    // alles daaronder schuift evenveel op.
+    const lijnY = Math.max(116, doc.y + 11);
+    const dy = lijnY - 116;
+    doc.moveTo(L, lijnY).lineTo(R, lijnY).lineWidth(1).strokeColor('#e3ded0').stroke();
 
     // Titel + meta
-    doc.fillColor(GROEN).font('Helvetica-Bold').fontSize(17).text('Factuur', L, 138);
+    doc.fillColor(GROEN).font('Helvetica-Bold').fontSize(17).text('Factuur', L, 138 + dy);
     doc.fillColor(INKT).font('Helvetica').fontSize(10);
     const datum = order.betaald_op || order.created_at;
-    doc.text(`Factuurnummer: ${order.id}`, L, 165);
-    doc.text(`Datum: ${new Date(datum).toLocaleDateString('nl-NL')}`, L, 180);
+    doc.text(`Factuurnummer: ${order.id}`, L, 165 + dy);
+    doc.text(`Datum: ${new Date(datum).toLocaleDateString('nl-NL')}`, L, 180 + dy);
 
     // Aan
-    doc.font('Helvetica-Bold').fontSize(10).fillColor(INKT).text('Aan', 330, 165);
+    doc.font('Helvetica-Bold').fontSize(10).fillColor(INKT).text('Aan', 330, 165 + dy);
     doc.font('Helvetica').fontSize(10).fillColor(GRIJS);
     const aan: string[] = [];
     if (order.klanttype === 'zakelijk' && order.bedrijfsnaam) {
@@ -70,14 +74,17 @@ export function maakFactuurPdf(order: OrderRow, items: ItemRow[]): Promise<Buffe
     }
     aan.push(order.email);
     if (order.telefoon) aan.push(order.telefoon);
-    doc.text(aan.join('\n'), 330, 180, { width: R - 330 });
+    doc.text(aan.join('\n'), 330, 180 + dy, { width: R - 330 });
+    const aanEinde = doc.y;
 
-    let y = 232;
+    let y = 232 + dy;
     if (order.ophaal_label) {
       doc.font('Helvetica').fontSize(10).fillColor(INKT).text(`Afhalen: ${order.ophaal_label}`, L, y);
       doc.text(club.adres, L, y + 14);
       y += 38;
     }
+    // De tabel begint altijd onder het Aan-blok, ook als dat lang is (zakelijk, geen afhaalregel).
+    y = Math.max(y, aanEinde + 16);
 
     // Regels
     const cOms = L, cAantal = 330, cStuk = 400, cTot = 480;

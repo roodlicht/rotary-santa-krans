@@ -122,6 +122,20 @@ export const betaling = {
   uitleg: 'Je betaalt veilig met iDEAL of Wero via Mollie.',
 };
 
+/*
+ * Onderwerpen van het contactformulier. Het label komt tussen [haken] vooraan in
+ * het onderwerp van de mail aan support@, zodat je per onderwerp kunt filteren
+ * of later automatisch kunt beantwoorden. Het id kan in een link: /contact?onderwerp=factuur
+ */
+export const contactOnderwerpen = [
+  { id: 'afhalen', label: 'Afhalen' },
+  { id: 'factuur', label: 'Factuur' },
+  { id: 'wijzigen', label: 'Bestelling wijzigen of annuleren' },
+  { id: 'betaling', label: 'Betaling' },
+  { id: 'zakelijk', label: 'Zakelijke bestelling' },
+  { id: 'overig', label: 'Overig' },
+];
+
 /* Meldingen aan de organisatie. */
 export const meldingen = {
   // Bij elke betaalde bestelling een mail naar het contactadres (support@).

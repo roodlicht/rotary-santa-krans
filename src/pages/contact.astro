@@ -1,20 +1,21 @@
 ---
 export const prerender = false;
 import Base from '../layouts/Base.astro';
-import { club, momenten } from '../config/site';
+import { club, momenten, contactOnderwerpen } from '../config/site';
 const verzonden = Astro.url.searchParams.get('verzonden') === '1';
+// Voorselectie via een link, bijv. /contact?onderwerp=factuur
+const voorkeur = contactOnderwerpen.find((o) => o.id === Astro.url.searchParams.get('onderwerp'))?.id;
 const fout = Astro.url.searchParams.get('fout') === '1';
 ---
-<Base title="Contact" active="contact" description="Vragen over je bestelling bij Rotary Santa Krans? Mail ons of gebruik het contactformulier.">
+<Base title="Contact" active="contact" description="Vragen over je bestelling bij Rotary Santa Krans? Stuur ons een bericht via het contactformulier.">
   <section class="wrap page-hero">
     <div class="eyebrow">Contact</div>
     <h1>Vragen over je bestelling?</h1>
-    <p>Mail ons of gebruik het formulier. We reageren zo snel mogelijk.</p>
+    <p>Stuur ons een bericht via het formulier. We reageren zo snel mogelijk.</p>
   </section>
   <section class="wrap split">
     <div class="infocard">
-      <h3>E-mail</h3>
-      <a href={`mailto:${club.contactEmail}`} style="font-family:'Young Serif';font-size:26px">{club.contactEmail}</a>
+      <h3>Afhalen</h3>
       <div class="row"><span>Afhaaladres</span><span>{club.adres}</span></div>
       <div class="row"><span>Bedrijven</span><span>{momenten.zakelijk.ophaalKort}, {momenten.zakelijk.ophaalTijd}</span></div>
       <div class="row"><span>Particulieren</span><span>{momenten.particulier.ophaalKort}, {momenten.particulier.ophaalTijd}</span></div>
@@ -35,6 +36,12 @@ const fout = Astro.url.searchParams.get('fout') === '1';
             <label class="field">Naam<input name="naam" required /></label>
             <label class="field">E-mail<input type="email" name="email" required /></label>
           </div>
+          <label class="field">Waar gaat je vraag over?
+            <select name="onderwerp" required>
+              <option value="" disabled selected={!voorkeur}>Kies een onderwerp…</option>
+              {contactOnderwerpen.map((o) => <option value={o.id} selected={o.id === voorkeur}>{o.label}</option>)}
+            </select>
+          </label>
           <label class="field">Bestelnummer (optioneel)<input name="ordernummer" placeholder="SK-2026-…" /></label>
           <label class="field">Bericht<textarea name="bericht" rows="5" required></textarea></label>
         </div>

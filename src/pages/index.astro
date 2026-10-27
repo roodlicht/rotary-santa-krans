@@ -14,7 +14,7 @@ const prijsGelijk = krans.prijsCent === stol.prijsCent;
 const tijden = [...new Set([momenten.zakelijk.ophaalTijd, momenten.particulier.ophaalTijd])];
 
 const jsonLd = [
-  { '@context': 'https://schema.org', '@type': 'Organization', name: club.naam, email: club.contactEmail, description: seo.beschrijving, address: { '@type': 'PostalAddress', streetAddress: 'Rietveen 1', postalCode: '4823 HK', addressLocality: 'Breda', addressCountry: 'NL' } },
+  { '@context': 'https://schema.org', '@type': 'Organization', name: club.naam, description: seo.beschrijving, address: { '@type': 'PostalAddress', streetAddress: 'Rietveen 1', postalCode: '4823 HK', addressLocality: 'Breda', addressCountry: 'NL' } },
   ...prodCards.map((p) => ({ '@context': 'https://schema.org', '@type': 'Product', name: p.naam, description: p.omschrijving, offers: { '@type': 'Offer', priceCurrency: 'EUR', price: (p.prijsCent / 100).toFixed(2), availability: 'https://schema.org/InStock' } })),
 ];
 ---
