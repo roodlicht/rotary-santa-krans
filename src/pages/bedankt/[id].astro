@@ -5,7 +5,7 @@ import { getOrder, getOrderMetToken, getItems } from '../../lib/orders';
 import { euroPrefix } from '../../lib/money';
 import { testmodus, haalStatus } from '../../lib/mollie';
 import { verwerkBetaling } from '../../lib/fulfil';
-import { momenten, club, type Klanttype } from '../../config/site';
+import { momenten, club, routeUrl, type Klanttype } from '../../config/site';
 
 const { id } = Astro.params;
 const token = Astro.url.searchParams.get('t');
@@ -55,7 +55,7 @@ const voornaam = order?.naam.split(' ')[0] || '';
         {moment && (
           <div class="pickup">
             <div class="d"><b>{moment.ophaalDag}</b><small>{moment.ophaalMaand}</small></div>
-            <div><b>Afhalen: {moment.ophalenTxt}</b><p>{club.adres}. Neem je bestelnummer {order.id} mee.</p></div>
+            <div><b>Afhalen: {moment.ophalenTxt}</b><p><a href={routeUrl(moment.adres)} target="_blank" rel="noopener">{moment.adres}</a>. Neem je bestelnummer {order.id} mee.</p></div>
           </div>
         )}
         <div class="ctas" style="margin-top:8px">

@@ -66,19 +66,13 @@ const links: [string, string, string][] = [
           <div>
             <h4>Afhalen</h4>
             <ul>
-              <li>{club.adres}</li>
-              {momenten.zakelijk.ophaalTijd === momenten.particulier.ophaalTijd ? (
-                <>
-                  <li>Bedrijven: {momenten.zakelijk.ophaalKort}</li>
-                  <li>Particulieren: {momenten.particulier.ophaalKort}</li>
-                  <li>{momenten.zakelijk.ophaalTijd}</li>
-                </>
-              ) : (
-                <>
-                  <li>Bedrijven: {momenten.zakelijk.ophaalKort}, {momenten.zakelijk.ophaalTijd}</li>
-                  <li>Particulieren: {momenten.particulier.ophaalKort}, {momenten.particulier.ophaalTijd}</li>
-                </>
-              )}
+              {[momenten.zakelijk, momenten.particulier].map((m) => (
+                <li>
+                  {m.label}: {m.ophaalKort}{momenten.zakelijk.ophaalTijd !== momenten.particulier.ophaalTijd && `, ${m.ophaalTijd}`}
+                  <br /><span style="opacity:.75">{m.adres}</span>
+                </li>
+              ))}
+              {momenten.zakelijk.ophaalTijd === momenten.particulier.ophaalTijd && <li>{momenten.zakelijk.ophaalTijd}</li>}
             </ul>
           </div>
           <div>

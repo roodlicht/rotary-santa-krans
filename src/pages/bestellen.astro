@@ -12,10 +12,9 @@ const startZakelijk = Astro.url.searchParams.get('zakelijk') === '1';
 const clientData = {
   prices: { krans: krans.prijsCent, stol: stol.prijsCent, donatie: donatie.prijsCent },
   moments: {
-    particulier: { label: momenten.particulier.label, deadlineIso: momenten.particulier.deadlineIso, deadlineTxt: momenten.particulier.deadlineTxt, pickupTxt: momenten.particulier.ophalenTxt, day: momenten.particulier.ophaalDag, mon: momenten.particulier.ophaalMaand },
-    zakelijk: { label: momenten.zakelijk.label, deadlineIso: momenten.zakelijk.deadlineIso, deadlineTxt: momenten.zakelijk.deadlineTxt, pickupTxt: momenten.zakelijk.ophalenTxt, day: momenten.zakelijk.ophaalDag, mon: momenten.zakelijk.ophaalMaand },
+    particulier: { label: momenten.particulier.label, deadlineIso: momenten.particulier.deadlineIso, deadlineTxt: momenten.particulier.deadlineTxt, pickupTxt: momenten.particulier.ophalenTxt, day: momenten.particulier.ophaalDag, mon: momenten.particulier.ophaalMaand, adres: momenten.particulier.adres },
+    zakelijk: { label: momenten.zakelijk.label, deadlineIso: momenten.zakelijk.deadlineIso, deadlineTxt: momenten.zakelijk.deadlineTxt, pickupTxt: momenten.zakelijk.ophalenTxt, day: momenten.zakelijk.ophaalDag, mon: momenten.zakelijk.ophaalMaand, adres: momenten.zakelijk.adres },
   },
-  address: club.adres,
   startZakelijk,
 };
 ---
@@ -65,7 +64,7 @@ const clientData = {
 
         <div class="pickup" id="pickup-card" hidden>
           <div class="d"><b id="pk-day">20</b><small id="pk-mon">dec</small></div>
-          <div><b id="pk-txt">Afhalen</b><p>{club.adres}</p></div>
+          <div><b id="pk-txt">Afhalen</b><p id="pk-adres"></p></div>
         </div>
       </div>
 
@@ -177,7 +176,7 @@ const clientData = {
         if (closed()) { cb.hidden = false; cb.textContent = 'De besteltermijn voor ' + m.label.toLowerCase() + ' is verlopen. Doneren kan nog wel.'; }
         else cb.hidden = true;
         const pc = $('pickup-card');
-        if (products() > 0) { pc.hidden = false; $('pk-day').textContent = m.day; $('pk-mon').textContent = m.mon; $('pk-txt').textContent = 'Afhalen: ' + m.pickupTxt; }
+        if (products() > 0) { pc.hidden = false; $('pk-day').textContent = m.day; $('pk-mon').textContent = m.mon; $('pk-txt').textContent = 'Afhalen: ' + m.pickupTxt; $('pk-adres').textContent = m.adres; }
         else pc.hidden = true;
       }
       function renderStep1() {

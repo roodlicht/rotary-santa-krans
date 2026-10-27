@@ -1,5 +1,8 @@
 import nodemailer from 'nodemailer';
-import { club, factuur, goedeDoel, meldingen } from '../config/site';
+import { club, factuur, goedeDoel, meldingen, momenten, type Klanttype } from '../config/site';
+
+/** Afhaaladres dat bij de bestelling hoort (leeg bij alleen een donatie). */
+const afhaalAdres = (order: OrderRow) => (order.ophaal_type ? momenten[order.ophaal_type as Klanttype]?.adres ?? '' : '');
 import { euroPrefix } from './money';
 import { maakFactuurPdf } from './invoice';
 import type { OrderRow, ItemRow } from './orders';
@@ -43,7 +46,7 @@ export async function stuurFactuur(order: OrderRow, items: ItemRow[]): Promise<v
     '',
     `Totaal betaald: ${euroPrefix(order.totaal_cent)}`,
     ...(order.ophaal_label
-      ? [`Afhalen: ${order.ophaal_label}`, `Adres: ${club.adres}`, `Neem je bestelnummer mee.`]
+      ? [`Afhalen: ${order.ophaal_label}`, `Adres: ${afhaalAdres(order)}`, `Neem je bestelnummer mee.`]
       : ['Je hebt alleen een donatie gedaan — er hoeft niets te worden afgehaald.']),
     '',
     `De opbrengst gaat naar ${goedeDoel.naam}. Hartelijk dank voor je steun!`,
@@ -79,7 +82,7 @@ export async function stuurBestelmelding(order: OrderRow, items: ItemRow[]): Pro
     ...regels,
     `  Totaal   ${euroPrefix(order.totaal_cent)}`,
     '',
-    `Afhalen:   ${order.ophaal_label || 'n.v.t. (alleen donatie)'}`,
+    `Afhalen:   ${order.ophaal_label ? `${order.ophaal_label}, ${afhaalAdres(order)}` : 'n.v.t. (alleen donatie)'}`,
     ...(order.opmerking ? ['', `Opmerking: ${order.opmerking}`] : []),
     '',
     'Alle bestellingen: /beheer',

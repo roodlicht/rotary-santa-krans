@@ -10,8 +10,6 @@ export const club = {
   naam: 'Rotary Santa Krans',
   jaar: 2026,
   contactEmail: 'support@rotarykerstkrans.nl',
-  adres: 'Rietveen 1, 4823 HK Breda',
-  maps: 'https://www.google.com/maps/search/?api=1&query=Rietveen+1+4823+HK+Breda',
   organisatie: 'Een actie van de vier Rotary clubs van Breda',
   clubs: [
     'Rotary Club Breda-Zuid',
@@ -83,6 +81,7 @@ export type Moment = {
   ophalenTxt: string;    // volledige afhaaltekst, ook op factuur en in mails
   ophaalKort: string;    // korte dag + datum, voor footer en contactpagina
   ophaalTijd: string;    // tijdvak
+  adres: string;         // afhaaladres van dit moment
   ophaalDag: string;     // dagnummer, voor de datumbadge
   ophaalMaand: string;
 };
@@ -97,6 +96,7 @@ export const momenten: Record<Klanttype, Moment> = {
     ophalenTxt: 'dinsdag 22 december, 18:00 – 21:00 uur',
     ophaalKort: 'di 22 december',
     ophaalTijd: '18:00 – 21:00 uur',
+    adres: 'Petrusstraat 17, 4834 WR Breda',
     ophaalDag: '22',
     ophaalMaand: 'dec',
   },
@@ -109,6 +109,7 @@ export const momenten: Record<Klanttype, Moment> = {
     ophalenTxt: 'dinsdag 8 december, 18:00 – 21:00 uur',
     ophaalKort: 'di 8 december',
     ophaalTijd: '18:00 – 21:00 uur',
+    adres: 'Rietveen 1, 4823 HK Breda',
     ophaalDag: '8',
     ophaalMaand: 'dec',
   },
@@ -155,3 +156,11 @@ export const factuur = {
     'Deze actie wordt verzorgd zonder winstoogmerk. Over deze bedragen wordt geen btw in rekening gebracht.',
   nummerPrefix: 'SK-2026',
 };
+
+/** Google Maps-route naar een adres. */
+export function routeUrl(adres: string): string {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(adres)}`;
+}
+
+/** Hebben beide afhaalmomenten hetzelfde adres? (bepaalt hoe de site het formuleert) */
+export const zelfdeAdres = momenten.zakelijk.adres === momenten.particulier.adres;

@@ -1,5 +1,5 @@
 import PDFDocument from 'pdfkit';
-import { factuur, club, goedeDoel } from '../config/site';
+import { factuur, club, goedeDoel, momenten, type Klanttype } from '../config/site';
 import { euroPrefix } from './money';
 import type { OrderRow, ItemRow } from './orders';
 
@@ -80,7 +80,7 @@ export function maakFactuurPdf(order: OrderRow, items: ItemRow[]): Promise<Buffe
     let y = 232 + dy;
     if (order.ophaal_label) {
       doc.font('Helvetica').fontSize(10).fillColor(INKT).text(`Afhalen: ${order.ophaal_label}`, L, y);
-      doc.text(club.adres, L, y + 14);
+      doc.text(momenten[order.ophaal_type as Klanttype]?.adres ?? '', L, y + 14);
       y += 38;
     }
     // De tabel begint altijd onder het Aan-blok, ook als dat lang is (zakelijk, geen afhaalregel).

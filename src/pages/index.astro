@@ -1,7 +1,7 @@
 ---
 export const prerender = true;
 import Base from '../layouts/Base.astro';
-import { club, seo, goedeDoel, organisatie, producten, momenten } from '../config/site';
+import { club, seo, goedeDoel, organisatie, producten, momenten, zelfdeAdres, routeUrl } from '../config/site';
 import { euroPrefix, euroKort } from '../lib/money';
 
 const krans = producten.find((p) => p.id === 'krans')!;
@@ -14,7 +14,7 @@ const prijsGelijk = krans.prijsCent === stol.prijsCent;
 const tijden = [...new Set([momenten.zakelijk.ophaalTijd, momenten.particulier.ophaalTijd])];
 
 const jsonLd = [
-  { '@context': 'https://schema.org', '@type': 'Organization', name: club.naam, description: seo.beschrijving, address: { '@type': 'PostalAddress', streetAddress: 'Rietveen 1', postalCode: '4823 HK', addressLocality: 'Breda', addressCountry: 'NL' } },
+  { '@context': 'https://schema.org', '@type': 'Organization', name: club.naam, description: seo.beschrijving },
   ...prodCards.map((p) => ({ '@context': 'https://schema.org', '@type': 'Product', name: p.naam, description: p.omschrijving, offers: { '@type': 'Offer', priceCurrency: 'EUR', price: (p.prijsCent / 100).toFixed(2), availability: 'https://schema.org/InStock' } })),
 ];
 ---
@@ -88,7 +88,7 @@ const jsonLd = [
     <div class="wrap">
       <div class="sec-head">
         <div><div class="eyebrow">Besteldata &amp; afhalen</div><h2>Twee afhaalmomenten</h2></div>
-        <p>Bedrijven en particulieren halen op verschillende dagen af, op hetzelfde adres: {club.adres}.</p>
+        <p>{zelfdeAdres ? `Bedrijven en particulieren halen op verschillende dagen af, op hetzelfde adres: ${momenten.zakelijk.adres}.` : 'Bedrijven en particulieren halen op verschillende dagen en op verschillende adressen af.'}</p>
       </div>
       <div class="moments">
         <div class="moment biz">
@@ -96,7 +96,7 @@ const jsonLd = [
           <div class="rows">
             <div class="row"><span>Bestellen tot</span><b>{momenten.zakelijk.deadlineTxt}</b></div>
             <div class="row"><span>Afhalen</span><b>{momenten.zakelijk.ophalenTxt}</b></div>
-            <div class="row"><span>Adres</span><b>{club.adres}</b></div>
+            <div class="row"><span>Adres</span><b><a href={routeUrl(momenten.zakelijk.adres)} target="_blank" rel="noopener" style="color:inherit">{momenten.zakelijk.adres}</a></b></div>
             <div class="row"><span>Factuur</span><b>Op bedrijfsnaam, na betaling</b></div>
           </div>
           <div class="moment-cta"><a class="btn btn-g" href="/bestellen?zakelijk=1">Zakelijk bestellen</a></div>
@@ -106,7 +106,7 @@ const jsonLd = [
           <div class="rows">
             <div class="row"><span>Bestellen tot</span><b>{momenten.particulier.deadlineTxt}</b></div>
             <div class="row"><span>Afhalen</span><b>{momenten.particulier.ophalenTxt}</b></div>
-            <div class="row"><span>Adres</span><b>{club.adres}</b></div>
+            <div class="row"><span>Adres</span><b><a href={routeUrl(momenten.particulier.adres)} target="_blank" rel="noopener" style="color:inherit">{momenten.particulier.adres}</a></b></div>
           </div>
           <div class="moment-cta"><a class="btn btn-o" style="border-color:#fff;color:#fff" href="/bestellen">Bestellen</a></div>
         </div>
@@ -114,7 +114,7 @@ const jsonLd = [
       <div class="steps3">
         <div class="s3"><div class="n">1</div><h3>Bestel online</h3><p>Kies kransen, stollen en/of donaties. Bestel je voor je bedrijf? Vink dan "zakelijk" aan.</p></div>
         <div class="s3"><div class="n">2</div><h3>Betaal met iDEAL | Wero</h3><p>Veilig afrekenen via Mollie. Je krijgt direct een bevestiging per e-mail.</p></div>
-        <div class="s3"><div class="n">3</div><h3>Haal je bestelling af</h3><p>Op je afhaalmoment{tijden.length === 1 ? ` (${tijden[0]})` : ''} aan het {club.adres}, met je bevestiging bij de hand.</p></div>
+        <div class="s3"><div class="n">3</div><h3>Haal je bestelling af</h3><p>Kom op je afhaalmoment{tijden.length === 1 ? ` (${tijden[0]})` : ''} naar {zelfdeAdres ? momenten.zakelijk.adres : 'het afhaaladres dat bij je bestelling hoort'}, met je bevestiging bij de hand.</p></div>
       </div>
     </div>
   </section>
