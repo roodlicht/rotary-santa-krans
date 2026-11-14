@@ -17,7 +17,7 @@
     "@astrojs/node": "^11.1.9",
     "@astrojs/sitemap": "^3.7.4",
     "@mollie/api-client": "^4.1.0",
-    "astro": "^7.4.2",
+    "astro": "^7.4.12",
     "better-sqlite3": "^13.0.3",
     "nodemailer": "^10.2.1",
     "pdfkit": "^0.16.0"
