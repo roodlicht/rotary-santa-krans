@@ -180,4 +180,5 @@ table.data th{color:var(--muted);font-weight:600}
 .tekst h2{font-size:28px;margin:34px 0 10px}
 .tekst p,.tekst li{margin-bottom:10px}
 .tekst ul{padding-left:22px;margin:0 0 10px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden} /* lokveld voor spambots */
 .allergeen{font-size:14px;color:var(--muted);margin-top:16px}

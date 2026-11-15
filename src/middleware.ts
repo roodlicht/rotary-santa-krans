@@ -2,6 +2,8 @@ import { defineMiddleware } from 'astro:middleware';
 import { sessieGeldig, COOKIE_NAAM } from './lib/auth';
 
 const VEILIGE_METHODEN = new Set(['GET', 'HEAD', 'OPTIONS']);
+// Formulieren zijn klein; grotere verzoeken weigeren voordat ze worden ingelezen.
+const MAX_BODY = 64 * 1024;
 
 /** Proxy-bewuste CSRF-check: Origin-host moet matchen met de draai-host. */
 function csrfGeweigerd(request: Request, pathname: string): boolean {
@@ -15,15 +17,65 @@ function csrfGeweigerd(request: Request, pathname: string): boolean {
   try { return new URL(origin).host !== host; } catch { return true; }
 }
 
+/** Status als de lengte ontbreekt of de body te groot is, anders null. */
+function bodyGeweigerd(request: Request): number | null {
+  if (VEILIGE_METHODEN.has(request.method)) return null;
+  const lengte = request.headers.get('content-length');
+  // Zonder lengte maar met een (chunked) body: de grootte is vooraf niet te controleren.
+  if (lengte === null) return request.headers.has('transfer-encoding') ? 411 : null;
+  return Number(lengte) > MAX_BODY ? 413 : null;
+}
+
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://cloud.umami.is",
+  "connect-src 'self' https://cloud.umami.is https://gateway.umami.is",
+  "img-src 'self' data:",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
+  "frame-ancestors 'none'",
+  // Na het bestelformulier volgt een redirect naar de betaalpagina van Mollie.
+  "form-action 'self' https://www.mollie.com https://*.mollie.com",
+  "base-uri 'self'",
+  "object-src 'none'",
+].join('; ');
+
+const HEADERS: Record<string, string> = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+  ...(import.meta.env.PROD ? { 'Strict-Transport-Security': 'max-age=15552000' } : {}),
+};
+
+/** Pagina's met persoonsgegevens niet laten bewaren door browser of proxy. */
+const geenCache = (pathname: string) =>
+  pathname.startsWith('/beheer') || pathname.startsWith('/api/beheer') || pathname.startsWith('/bedankt') || pathname.startsWith('/api/factuur');
+
+function zetHeaders(response: Response, pathname: string): Response {
+  try {
+    for (const [k, v] of Object.entries(HEADERS)) response.headers.set(k, v);
+    if ((response.headers.get('content-type') || '').includes('text/html')) response.headers.set('Content-Security-Policy', CSP);
+    if (geenCache(pathname)) response.headers.set('Cache-Control', 'no-store');
+    return response;
+  } catch {
+    // Onveranderbare headers (bv. Response.redirect): kopie maken.
+    const kopie = new Response(response.body, response);
+    return zetHeaders(kopie, pathname);
+  }
+}
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
   if (csrfGeweigerd(context.request, pathname)) {
     return new Response('Verzoek geweigerd (ongeldige herkomst).', { status: 403 });
   }
+  const bodyStatus = bodyGeweigerd(context.request);
+  if (bodyStatus) return new Response('Verzoek geweigerd (te groot of zonder lengte).', { status: bodyStatus });
   if (pathname.startsWith('/beheer') && pathname !== '/beheer/login') {
     if (!sessieGeldig(context.cookies.get(COOKIE_NAAM)?.value)) {
-      return context.redirect('/beheer/login');
+      return zetHeaders(context.redirect('/beheer/login'), pathname);
     }
   }
-  return next();
+  return zetHeaders(await next(), pathname);
 });

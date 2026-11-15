@@ -1,7 +1,8 @@
 ---
 export const prerender = false;
 import Base from '../layouts/Base.astro';
-import { producten, momenten, betaling, club, allergenen } from '../config/site';
+import { producten, momenten, betaling, club, allergenen, maxAantal } from '../config/site';
+import { MAX } from '../lib/invoer';
 import { euroPrefix, euroKort } from '../lib/money';
 
 const krans = producten.find((p) => p.id === 'krans')!;
@@ -16,6 +17,7 @@ const clientData = {
     zakelijk: { label: momenten.zakelijk.label, deadlineIso: momenten.zakelijk.deadlineIso, deadlineTxt: momenten.zakelijk.deadlineTxt, pickupTxt: momenten.zakelijk.ophalenTxt, day: momenten.zakelijk.ophaalDag, mon: momenten.zakelijk.ophaalMaand, adres: momenten.zakelijk.adres },
   },
   startZakelijk,
+  max: maxAantal,
 };
 ---
 <Base title="Bestellen" active="bestellen" description="Bestel een roomboter kerstkrans of ambachtelijke kerststol, of doneer aan het Jeugdfonds Sport & Cultuur Breda. Betalen met iDEAL of Wero.">
@@ -31,6 +33,7 @@ const clientData = {
       <input type="hidden" name="aantal_krans" id="f-krans" value="0" />
       <input type="hidden" name="aantal_stol" id="f-stol" value="0" />
       <input type="hidden" name="aantal_donatie" id="f-donatie" value="0" />
+      <div class="hp" aria-hidden="true"><label>Laat dit veld leeg<input name="website" tabindex="-1" autocomplete="off" /></label></div>
 
       <div class="stepbar">
         <div class="stp on" data-stp="0"><i>1</i>Bestelling</div>
@@ -75,19 +78,19 @@ const clientData = {
         <p class="intro" id="gegevens-intro"></p>
         <div style="display:grid;gap:14px">
           <div id="biz-fields" hidden style="display:grid;gap:14px">
-            <label class="field" data-f="company">Bedrijfsnaam<input id="company" name="bedrijfsnaam" autocomplete="organization" /></label>
-            <label class="field" data-f="straat">Straat en huisnummer<input id="straat" name="straat" autocomplete="street-address" /></label>
+            <label class="field" data-f="company">Bedrijfsnaam<input id="company" name="bedrijfsnaam" autocomplete="organization" maxlength={MAX.bedrijfsnaam} /></label>
+            <label class="field" data-f="straat">Straat en huisnummer<input id="straat" name="straat" autocomplete="street-address" maxlength={MAX.straat} /></label>
             <div class="grid2">
-              <label class="field" data-f="postcode">Postcode<input id="postcode" name="postcode" autocomplete="postal-code" /></label>
-              <label class="field" data-f="plaats">Plaats<input id="plaats" name="plaats" autocomplete="address-level2" /></label>
+              <label class="field" data-f="postcode">Postcode<input id="postcode" name="postcode" autocomplete="postal-code" maxlength={MAX.postcode} /></label>
+              <label class="field" data-f="plaats">Plaats<input id="plaats" name="plaats" autocomplete="address-level2" maxlength={MAX.plaats} /></label>
             </div>
           </div>
-          <label class="field" data-f="name"><span id="name-label">Naam</span><input id="name" name="naam" /></label>
+          <label class="field" data-f="name"><span id="name-label">Naam</span><input id="name" name="naam" maxlength={MAX.naam} /></label>
           <div class="grid2">
-            <label class="field" data-f="email">E-mailadres<input id="email" name="email" type="email" /></label>
-            <label class="field" data-f="phone">Telefoonnummer<input id="phone" name="telefoon" type="tel" /></label>
+            <label class="field" data-f="email">E-mailadres<input id="email" name="email" type="email" maxlength={MAX.email} /></label>
+            <label class="field" data-f="phone">Telefoonnummer<input id="phone" name="telefoon" type="tel" maxlength={MAX.telefoon} /></label>
           </div>
-          <label class="field">Opmerking (optioneel)<textarea id="note" name="opmerking" rows="3"></textarea></label>
+          <label class="field">Opmerking (optioneel)<textarea id="note" name="opmerking" rows="3" maxlength={MAX.opmerking}></textarea></label>
         </div>
         <label class="check"><input type="checkbox" id="agree" /><span>Ik ga akkoord met de <a href="/voorwaarden" target="_blank" rel="noopener">voorwaarden</a><span id="agree-extra"></span>.</span></label>
         <p class="allergeen" style="margin-top:10px">We gebruiken je gegevens alleen voor je bestelling. Lees onze <a href="/privacy" target="_blank" rel="noopener">privacyverklaring</a>.</p>
@@ -139,7 +142,7 @@ const clientData = {
       function closed() { return Date.now() > new Date(mom().deadlineIso).getTime(); }
       function products() { return qty.krans + qty.stol; }
       function total() { return qty.krans * D.prices.krans + qty.stol * D.prices.stol + qty.donatie * D.prices.donatie; }
-      function emailOk() { return /\S+@\S+\.\S+/.test($('email').value); }
+      function emailOk() { return /^[^\s@,;<>()"\\]+@[^\s@,;<>()"\\]+\.[^\s@,;<>()"\\.]{2,}$/.test($('email').value.trim()); }
 
       function valid(s) {
         if (s === 0) return total() > 0 && !(closed() && products() > 0);
@@ -205,7 +208,7 @@ const clientData = {
       // steppers
       document.querySelectorAll('.stepper').forEach((s) => {
         const k = s.dataset.prod, inp = s.querySelector('.qty');
-        const set = (v) => { qty[k] = Math.max(0, Math.min(999, v | 0)); inp.value = qty[k]; renderSummary(); if (step === 0) renderStep0(); };
+        const set = (v) => { qty[k] = Math.max(0, Math.min(D.max, v | 0)); inp.value = qty[k]; renderSummary(); if (step === 0) renderStep0(); };
         s.querySelector('.dec').addEventListener('click', () => set(qty[k] - 1));
         s.querySelector('.inc').addEventListener('click', () => set(qty[k] + 1));
         inp.addEventListener('input', () => set(parseInt(inp.value.replace(/\D/g, '')) || 0));

@@ -6,7 +6,10 @@ import { producten } from '../../../config/site';
 export const prerender = false;
 
 function cel(v: string | number): string {
-  const s = String(v ?? '');
+  let s = String(v ?? '');
+  // CSV-injectie: Excel voert cellen die met = + - @ beginnen uit als formule.
+  // Telefoonnummers als +31 6… zijn onschuldig en blijven zoals ze zijn.
+  if (/^[=@\t\r]/.test(s) || (/^[+-]/.test(s) && !/^[+-][\d\s().-]*$/.test(s))) s = `'${s}`;
   return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 

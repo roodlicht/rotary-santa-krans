@@ -1,6 +1,6 @@
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { db } from './db';
-import { producten, momenten, factuur, kransId, stolId, donatieId, type Klanttype } from '../config/site';
+import { producten, momenten, factuur, kransId, stolId, donatieId, maxAantal, type Klanttype } from '../config/site';
 
 export type OrderInput = {
   klanttype: Klanttype;
@@ -71,6 +71,7 @@ export function maakBestelling(input: OrderInput, nu = new Date()): { id: string
     .map((p) => {
       const aantal = Math.max(0, Math.floor(Number(input.aantallen[p.id]) || 0));
       if (aantal <= 0) return null;
+      if (aantal > maxAantal) throw new BestelFout(`Je kunt maximaal ${maxAantal} per product bestellen. Neem voor grotere aantallen contact met ons op.`);
       return { product_id: p.id, naam: p.naam, stukprijs_cent: p.prijsCent, aantal, regel_cent: p.prijsCent * aantal };
     })
     .filter((r): r is NonNullable<typeof r> => r !== null);

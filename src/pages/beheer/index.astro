@@ -24,7 +24,7 @@ const emailsVan = (type: string | null) => [...new Set(ordersVan(type).map((o) =
       <h1 style="font-size:40px">Bestellingen</h1>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <a class="btn btn-o" href="/api/beheer/export.csv">Export alles (CSV) ↓</a>
-        <a class="btn btn-o" href="/api/beheer/login">Uitloggen</a>
+        <form method="post" action="/api/beheer/logout" style="display:contents"><button class="btn btn-o" type="submit">Uitloggen</button></form>
       </div>
     </div>
 

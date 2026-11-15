@@ -16,17 +16,23 @@ export function beheerGeconfigureerd(): boolean {
 function teken(waarde: string): string {
   return createHmac('sha256', SECRET).update(waarde).digest('hex');
 }
-export function maakSessie(): string {
-  const waarde = 'beheerder';
+export const SESSIE_MS = 8 * 60 * 60 * 1000;
+
+/** Sessie = 'beheerder.<verloopt-op>.<handtekening>': na 8 uur ongeldig, ook als het cookie blijft bestaan. */
+export function maakSessie(nu = Date.now()): string {
+  const waarde = `beheerder.${nu + SESSIE_MS}`;
   return `${waarde}.${teken(waarde)}`;
 }
-export function sessieGeldig(token: string | undefined): boolean {
+export function sessieGeldig(token: string | undefined, nu = Date.now()): boolean {
   if (!token || !beheerGeconfigureerd()) return false;
-  const [waarde, sig] = token.split('.');
-  if (!waarde || !sig) return false;
-  const a = Buffer.from(sig);
+  const i = token.lastIndexOf('.');
+  if (i <= 0) return false;
+  const waarde = token.slice(0, i);
+  const a = Buffer.from(token.slice(i + 1));
   const b = Buffer.from(teken(waarde));
-  return a.length === b.length && timingSafeEqual(a, b);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return false;
+  const verlooptOp = Number(waarde.split('.')[1]);
+  return Number.isFinite(verlooptOp) && nu < verlooptOp;
 }
 export function wachtwoordKlopt(ingevoerd: string): boolean {
   if (!beheerGeconfigureerd()) return false;

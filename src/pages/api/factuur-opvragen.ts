@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { getOrder, getItems } from '../../lib/orders';
 import { stuurFactuur } from '../../lib/mail';
+import { isBot } from '../../lib/invoer';
+import { teVaak, bezoekerIp, teVeelResponse } from '../../lib/limiet';
 
 export const prerender = false;
 
@@ -8,8 +10,11 @@ export const prerender = false;
     Altijd dezelfde bevestiging, ook zonder match (geen aftasten mogelijk).
     Alleen als het versturen zelf mislukt volgt een foutmelding; die ziet alleen
     wie bestelnummer én e-mailadres al kent, dus dat verraadt niets. */
-export const POST: APIRoute = async ({ request, redirect }) => {
+export const POST: APIRoute = async (ctx) => {
+  const { request, redirect } = ctx;
+  if (teVaak(`factuur:${bezoekerIp(ctx)}`, 5, 10 * 60 * 1000)) return teVeelResponse();
   const form = await request.formData();
+  if (isBot(form)) return redirect('/factuur-opvragen?verstuurd=1', 303);
   const ordernummer = (form.get('ordernummer')?.toString() || '').trim();
   const email = (form.get('email')?.toString() || '').trim().toLowerCase();
   const order = getOrder(ordernummer);

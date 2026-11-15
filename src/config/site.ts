@@ -62,6 +62,9 @@ export const producten: Product[] = [
   { id: 'donatie', naam: 'Donatie', omschrijving: 'Een gift aan het Jeugdfonds, zonder product.', prijsCent: 1250 },
 ];
 
+/** Maximaal aantal per product in één bestelling; meer via het contactformulier. */
+export const maxAantal = 500;
+
 export const kransId = 'krans';
 export const stolId = 'stol';
 export const donatieId = 'donatie';
