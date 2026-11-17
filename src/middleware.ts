@@ -34,8 +34,10 @@ const CSP = [
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
   "frame-ancestors 'none'",
-  // Na het bestelformulier volgt een redirect naar de betaalpagina van Mollie.
-  "form-action 'self' https://www.mollie.com https://*.mollie.com",
+  // Na het bestelformulier volgt een redirect naar Mollie, en van daar naar
+  // iDEAL/Wero/de bank. De browser toetst elke stap van die keten, dus elke
+  // https-bestemming toestaan (anders blijft "Doorsturen naar iDEAL" hangen).
+  "form-action 'self' https:",
   "base-uri 'self'",
   "object-src 'none'",
 ].join('; ');
