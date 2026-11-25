@@ -13,9 +13,9 @@ export const club = {
   organisatie: 'Een actie van de vier Rotary clubs van Breda',
   clubs: [
     { naam: 'Rotary Club Breda-Zuid', url: 'https://www.rotary.nl/bredazuid/' },
-    { naam: 'Rotary Club Breda-Mark en Aa', url: 'https://www.rotary.nl/bredamarkenaa/' },
-    { naam: 'Rotary Club Breda', url: 'https://www.rotary.nl/breda/' },
-    { naam: 'Rotary Club Breda-Mastbos', url: 'https://www.rotary.nl/bredamastbos/' },
+    { naam: 'Rotary Club Breda-Mark en Aa', url: 'https://www.rotary.nl/bredamarkenaa/', nofollow: true },
+    { naam: 'Rotary Club Breda', url: 'https://www.rotary.nl/breda/', nofollow: true },
+    { naam: 'Rotary Club Breda-Mastbos', url: 'https://www.rotary.nl/bredamastbos/', nofollow: true },
   ],
 };
 
