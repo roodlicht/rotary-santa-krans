@@ -12,10 +12,10 @@ export const club = {
   contactEmail: 'support@rotarykerstkrans.nl',
   organisatie: 'Een actie van de vier Rotary clubs van Breda',
   clubs: [
-    'Rotary Club Breda-Zuid',
-    'Rotary Club Breda-Mark en Aa',
-    'Rotary Club Breda',
-    'Rotary Club Breda-Mastbos',
+    { naam: 'Rotary Club Breda-Zuid', url: 'https://www.rotary.nl/bredazuid/' },
+    { naam: 'Rotary Club Breda-Mark en Aa', url: 'https://www.rotary.nl/bredamarkenaa/' },
+    { naam: 'Rotary Club Breda', url: 'https://www.rotary.nl/breda/' },
+    { naam: 'Rotary Club Breda-Mastbos', url: 'https://www.rotary.nl/bredamastbos/' },
   ],
 };
 

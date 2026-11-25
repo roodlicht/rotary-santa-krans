@@ -133,7 +133,7 @@ const jsonLd = [
           <h2>{organisatie.titel}</h2>
           <p>{organisatie.intro}</p>
         </div>
-        <div class="clublist">{club.clubs.map((c) => <div>{c}</div>)}</div>
+        <div class="clublist">{club.clubs.map((c) => <a href={c.url} target="_blank" rel="noopener">{c.naam}</a>)}</div>
       </div>
     </div>
   </section>
